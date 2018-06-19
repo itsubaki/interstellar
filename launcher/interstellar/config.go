@@ -1,4 +1,4 @@
-package launcher
+package interstellar
 
 type Config struct {
 }
