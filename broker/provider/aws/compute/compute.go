@@ -1,8 +1,12 @@
-package aws
+package compute
 
 import "github.com/itsubaki/interstellar/broker"
 
 type ComputeBroker struct {
+}
+
+func NewComputeBroker() *ComputeBroker {
+	return &ComputeBroker{}
 }
 
 func (b *ComputeBroker) Catalog() *broker.Catalog {

@@ -1,8 +1,12 @@
-package aws
+package database
 
 import "github.com/itsubaki/interstellar/broker"
 
 type DatabaseBroker struct {
+}
+
+func NewDatabaseBroker() *DatabaseBroker {
+	return &DatabaseBroker{}
 }
 
 func (b *DatabaseBroker) Catalog() *broker.Catalog {

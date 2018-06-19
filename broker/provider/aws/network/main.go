@@ -1,5 +1,7 @@
 package network
 
-func main() {
+import "github.com/itsubaki/interstellar/broker"
 
+func main() {
+	broker.Run(NewNetworkBroker())
 }

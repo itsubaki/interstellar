@@ -1,8 +1,12 @@
-package aws
+package network
 
 import "github.com/itsubaki/interstellar/broker"
 
 type NetworkBroker struct {
+}
+
+func NewNetworkBroker() *NetworkBroker {
+	return &NetworkBroker{}
 }
 
 func (b *NetworkBroker) Catalog() *broker.Catalog {
