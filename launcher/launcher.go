@@ -3,6 +3,18 @@ package launcher
 type Launcher struct {
 }
 
+type RegisterInput struct {
+}
+
+type RegisterOutput struct {
+}
+
+type ListInput struct {
+}
+
+type ListOutput struct {
+}
+
 func NewLauncher(conf *Config) *Launcher {
 	return &Launcher{}
 }
