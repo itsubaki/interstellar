@@ -1,12 +1,17 @@
 package broker
 
 type ServiceBroker interface {
+	Config() *Config
 	Catalog() *Catalog
 	Binding(in *BindingInput) *BindingOutput
 	Unbinding(in *UnbindingInput) *UnbindingOutput
 	Create(in *CreateInput) *CreateOutput
 	Delete(in *DeleteInput) *DeleteOutput
 	Update(in *UpdateInput) *UpdateOutput
+}
+
+type Config struct {
+	Port string
 }
 
 type Catalog struct {
