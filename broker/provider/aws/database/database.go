@@ -9,6 +9,10 @@ func NewDatabaseBroker() *DatabaseBroker {
 	return &DatabaseBroker{}
 }
 
+func (b *DatabaseBroker) Config() *broker.Config {
+	return &broker.Config{}
+}
+
 func (b *DatabaseBroker) Catalog() *broker.Catalog {
 	return &broker.Catalog{}
 }

@@ -9,6 +9,10 @@ func NewCacheBroker() *CacheBroker {
 	return &CacheBroker{}
 }
 
+func (b *CacheBroker) Config() *broker.Config {
+	return &broker.Config{}
+}
+
 func (b *CacheBroker) Catalog() *broker.Catalog {
 	return &broker.Catalog{}
 }

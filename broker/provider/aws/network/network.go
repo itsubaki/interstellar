@@ -9,6 +9,10 @@ func NewNetworkBroker() *NetworkBroker {
 	return &NetworkBroker{}
 }
 
+func (b *NetworkBroker) Config() *broker.Config {
+	return &broker.Config{}
+}
+
 func (b *NetworkBroker) Catalog() *broker.Catalog {
 	return &broker.Catalog{}
 }

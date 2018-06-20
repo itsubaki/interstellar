@@ -9,6 +9,10 @@ func NewComputeBroker() *ComputeBroker {
 	return &ComputeBroker{}
 }
 
+func (b *ComputeBroker) Config() *broker.Config {
+	return &broker.Config{}
+}
+
 func (b *ComputeBroker) Catalog() *broker.Catalog {
 	return &broker.Catalog{}
 }
