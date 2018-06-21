@@ -1,4 +1,4 @@
-package database
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 
@@ -10,7 +10,9 @@ func NewDatabaseBroker() *DatabaseBroker {
 }
 
 func (b *DatabaseBroker) Config() *broker.Config {
-	return &broker.Config{}
+	return &broker.Config{
+		Port: ":9082",
+	}
 }
 
 func (b *DatabaseBroker) Catalog() *broker.Catalog {

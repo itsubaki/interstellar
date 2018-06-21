@@ -1,4 +1,4 @@
-package compute
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 

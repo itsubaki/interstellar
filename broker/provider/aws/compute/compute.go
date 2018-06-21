@@ -1,4 +1,4 @@
-package compute
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 
@@ -10,7 +10,9 @@ func NewComputeBroker() *ComputeBroker {
 }
 
 func (b *ComputeBroker) Config() *broker.Config {
-	return &broker.Config{}
+	return &broker.Config{
+		Port: ":9081",
+	}
 }
 
 func (b *ComputeBroker) Catalog() *broker.Catalog {

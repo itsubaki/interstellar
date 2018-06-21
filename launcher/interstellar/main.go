@@ -1,4 +1,4 @@
-package interstellar
+package main
 
 import (
 	"log"
@@ -7,10 +7,7 @@ import (
 )
 
 func main() {
-	c := NewConfig()
-	log.Printf("config=%v\n", c)
-
-	i := NewInterstellar(c)
+	i := NewInterstellar()
 	if err := launcher.Run(i); err != nil {
 		log.Println(err)
 	}

@@ -1,4 +1,4 @@
-package network
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 
@@ -10,7 +10,9 @@ func NewNetworkBroker() *NetworkBroker {
 }
 
 func (b *NetworkBroker) Config() *broker.Config {
-	return &broker.Config{}
+	return &broker.Config{
+		Port: ":9083",
+	}
 }
 
 func (b *NetworkBroker) Catalog() *broker.Catalog {

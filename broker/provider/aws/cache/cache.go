@@ -1,4 +1,4 @@
-package cache
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 
@@ -10,7 +10,9 @@ func NewCacheBroker() *CacheBroker {
 }
 
 func (b *CacheBroker) Config() *broker.Config {
-	return &broker.Config{}
+	return &broker.Config{
+		Port: ":9080",
+	}
 }
 
 func (b *CacheBroker) Catalog() *broker.Catalog {

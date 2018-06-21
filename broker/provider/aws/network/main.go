@@ -1,4 +1,4 @@
-package network
+package main
 
 import "github.com/itsubaki/interstellar/broker"
 

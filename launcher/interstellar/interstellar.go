@@ -1,12 +1,18 @@
-package interstellar
+package main
 
 import "github.com/itsubaki/interstellar/launcher"
 
 type Interstellar struct {
 }
 
-func NewInterstellar(conf *Config) *Interstellar {
+func NewInterstellar() *Interstellar {
 	return &Interstellar{}
+}
+
+func (i *Interstellar) Config() *launcher.Config {
+	return &launcher.Config{
+		Port: ":8080",
+	}
 }
 
 func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOutput {
