@@ -96,9 +96,15 @@ type UpdateOutput struct {
 }
 
 type BindingInput struct {
+	InstanceID string       `json:"instance_id"`
+	Parameter  []*Parameter `json:"parameter"`
 }
 
 type BindingOutput struct {
+	Status  int          `json:"status"`
+	Message string       `json:"message"`
+	Input   *UpdateInput `json:"input"`
+	Output  []*Output    `json:"output"`
 }
 
 type UnbindingInput struct {

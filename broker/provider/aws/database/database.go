@@ -16,19 +16,30 @@ func (b *DatabaseBroker) Config() *broker.Config {
 }
 
 func (b *DatabaseBroker) Catalog() *broker.Catalog {
-	return &broker.Catalog{}
-}
-
-func (b *DatabaseBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
-	return &broker.BindingOutput{}
-}
-
-func (b *DatabaseBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
-	return &broker.UnbindingOutput{}
+	return &broker.Catalog{
+		Name: "aws_database",
+		Tag: []string{
+			"aws",
+			"database",
+		},
+		Require:  []string{"aws_initialize"},
+		Bindable: true,
+	}
 }
 
 func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	return &broker.CreateOutput{}
+	// in.Parameter["master_username"]
+	// in.Parameter["master_password"]
+	return &broker.CreateOutput{
+		Status:  201,
+		Message: "Created",
+		Input:   in,
+		Output: []*broker.Output{
+			{Key: "username", Value: "foobar"},
+			{Key: "password", Value: "hogehoge"},
+			{Key: "endpoint", Value: "db://foobar"},
+		},
+	}
 }
 
 func (b *DatabaseBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
@@ -37,4 +48,16 @@ func (b *DatabaseBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
 
 func (b *DatabaseBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 	return &broker.UpdateOutput{}
+}
+
+func (b *DatabaseBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
+	// sg := in.Parameter["securitygroup_id"]
+	// Add sg with 3306 to database_sg
+	return &broker.BindingOutput{}
+}
+
+func (b *DatabaseBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
+	// sg := in.Parameter["securitygroup_id"]
+	// Delete sg from database_sg
+	return &broker.UnbindingOutput{}
 }
