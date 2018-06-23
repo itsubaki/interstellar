@@ -28,13 +28,12 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 }
 
 func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
+	// create securitygroup, iam
 	return &broker.CreateOutput{
 		Status:  201,
 		Message: "Created",
 		Input:   in,
-		Output: []*broker.Output{
-			{Key: "securitygroup", Value: "sg-12345678"},
-		},
+		Output:  []*broker.Output{},
 	}
 }
 

@@ -32,21 +32,14 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	// in.Parameter["project_name"]
 	// in.Parameter["vpc_cidr"]
 	// in.Parameter["domain"]
+
+	// create s3bucket, vpc, subnet, certificate, hostedzone
 	return &broker.CreateOutput{
 		Status:  201,
 		Message: "Created",
 		Input:   in,
 		Output: []*broker.Output{
-			{Key: "vpc_id", Value: "vpc-12345678"},
-			{Key: "subnet_a_public", Value: "subnet-12345678"},
-			{Key: "subnet_b_public", Value: "subnet-12345678"},
-			{Key: "subnet_c_public", Value: "subnet-12345678"},
-			{Key: "subnet_a_private", Value: "subnet-12345678"},
-			{Key: "subnet_b_private", Value: "subnet-12345678"},
-			{Key: "subnet_c_private", Value: "subnet-12345678"},
-			{Key: "hostedzone", Value: "${project_name}.${domain}."},
 			{Key: "nameserver", Value: "ns-1,ns-2,ns-3,ns-4"},
-			{Key: "certificate", Value: "acm-12345678"},
 			{Key: "bucket_log", Value: "s3://log.${project_name}.${domain}"},
 			{Key: "bucket_deploy", Value: "s3://deploy.${project_name}.${domain}"},
 			{Key: "bucket_config", Value: "s3://config.${project_name}.${domain}"},
