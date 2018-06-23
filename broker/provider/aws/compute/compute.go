@@ -28,12 +28,17 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 }
 
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
+	// in.Parameter["project_name"]
+	// in.Parameter["instance_name"]
+	// in.Parameter["image_id"]
+	// s3://deploy.${project_name}.${domain}/application/release/v1.0.tar.gz
+	// in.Parameter["application_key"]
 	return &broker.CreateOutput{
 		Status:  201,
 		Message: "Created",
 		Input:   in,
 		Output: []*broker.Output{
-			{Key: "endpoint", Value: "https://foobar"},
+			{Key: "endpoint", Value: "https://${instance_name}.${project_name}.{domain}"},
 			{Key: "securitygroup_id", Value: "sg-12345678"},
 		},
 	}

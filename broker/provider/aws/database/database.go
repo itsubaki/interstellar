@@ -22,12 +22,14 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 			"aws",
 			"database",
 		},
-		Require:  []string{"aws_initialize"},
+		Require:  []string{"aws_project"},
 		Bindable: true,
 	}
 }
 
 func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
+	// in.Parameter["project_name"]
+	// in.Parameter["instance_name"]
 	// in.Parameter["master_username"]
 	// in.Parameter["master_password"]
 	return &broker.CreateOutput{
@@ -37,7 +39,8 @@ func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 		Output: []*broker.Output{
 			{Key: "username", Value: "foobar"},
 			{Key: "password", Value: "hogehoge"},
-			{Key: "endpoint", Value: "db://foobar"},
+			{Key: "endpoint_write", Value: "db://${instance_name}.write.${project_name}.${domain}"},
+			{Key: "endpoint_read", Value: "db://${instance_name}.read.${project_name}.${domain}"},
 		},
 	}
 }
