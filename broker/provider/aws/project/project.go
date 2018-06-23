@@ -11,7 +11,7 @@ func NewProjectBroker() *ProjectBroker {
 
 func (b *ProjectBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9083",
+		Port: ":9084",
 	}
 }
 
@@ -44,8 +44,6 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 			{Key: "subnet_a_private", Value: "subnet-12345678"},
 			{Key: "subnet_b_private", Value: "subnet-12345678"},
 			{Key: "subnet_c_private", Value: "subnet-12345678"},
-			{Key: "project_name", Value: "${project_name}"},
-			{Key: "domain", Value: "${domain}"},
 			{Key: "hostedzone", Value: "${project_name}.${domain}."},
 			{Key: "nameserver", Value: "ns-1,ns-2,ns-3,ns-4"},
 			{Key: "certificate", Value: "acm-12345678"},

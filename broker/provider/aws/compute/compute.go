@@ -29,6 +29,7 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	// in.Parameter["project_name"]
+	// in.Parameter["environment"]
 	// in.Parameter["instance_name"]
 	// in.Parameter["image_id"]
 	// s3://deploy.${project_name}.${domain}/application/release/v1.0.tar.gz
@@ -38,8 +39,7 @@ func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 		Message: "Created",
 		Input:   in,
 		Output: []*broker.Output{
-			{Key: "endpoint", Value: "https://${instance_name}.${project_name}.{domain}"},
-			{Key: "securitygroup_id", Value: "sg-12345678"},
+			{Key: "endpoint", Value: "https://${environ}-${instance_name}.${project_name}.{domain}"},
 		},
 	}
 }
