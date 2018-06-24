@@ -22,21 +22,22 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 			"aws",
 			"compute",
 		},
-		Require:  []string{"aws_initialize"},
+		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: false,
+		ParameterSpec: []*broker.ParamSpec{
+			{Name: "project_name", Required: true},
+			{Name: "environ_name", Required: true},
+			{Name: "instance_name", Required: true},
+			{Name: "image_id", Required: true},
+			{Name: "package", Required: true},
+		},
 	}
 }
 
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// in.Parameter["project_name"]
-	// in.Parameter["environment"]
-	// in.Parameter["instance_name"]
-	// in.Parameter["image_id"]
-	// s3://deploy.${project_name}.${domain}/application/release/v1.0.tar.gz
-	// in.Parameter["application_key"]
 	return &broker.CreateOutput{
-		Status:  201,
-		Message: "Created",
+		Status:  202,
+		Message: "Accepted",
 		Input:   in,
 		Output: []*broker.Output{
 			{Key: "endpoint", Value: "https://${environ}-${instance_name}.${project_name}.{domain}"},
@@ -58,4 +59,8 @@ func (b *ComputeBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
 
 func (b *ComputeBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
 	return &broker.UnbindingOutput{}
+}
+
+func (b *ComputeBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
+	return &broker.StatusOutput{}
 }

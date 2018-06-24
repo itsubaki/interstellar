@@ -38,3 +38,7 @@ func (b *CacheBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
 func (b *CacheBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 	return &broker.UpdateOutput{}
 }
+
+func (b *CacheBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
+	return &broker.StatusOutput{}
+}

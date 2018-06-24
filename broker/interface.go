@@ -27,6 +27,8 @@ type ServiceBroker interface {
 	// 200 OK: changes have been applied
 	// 202 Accepted: instance update is in progress
 	Update(in *UpdateInput) *UpdateOutput
+
+	Status(in *StatusInput) *StatusOutput
 }
 
 type Config struct {
@@ -45,7 +47,7 @@ type Catalog struct {
 
 type ParamSpec struct {
 	Name         string   `json:"name"`
-	Type         string   `json:"type"`
+	Required     bool     `json:"required"`
 	DefaultValue string   `json:"default_value"`
 	AllowedValue []string `json:"allowed_value"`
 	Description  string   `json:"description"`
@@ -111,4 +113,13 @@ type UnbindingInput struct {
 }
 
 type UnbindingOutput struct {
+}
+
+type StatusInput struct {
+	InstanceID string `json:"instance_id"`
+}
+
+type StatusOutput struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }

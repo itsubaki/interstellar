@@ -24,19 +24,20 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{},
 		Bindable: false,
+		ParameterSpec: []*broker.ParamSpec{
+			{Name: "integration_role_arn", Required: true},
+			{Name: "project_name", Required: true},
+			{Name: "cidr", Required: true},
+			{Name: "domain", Required: true},
+		},
 	}
 }
 
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// in.Parameter["integration_role_arn"]
-	// in.Parameter["project_name"]
-	// in.Parameter["vpc_cidr"]
-	// in.Parameter["domain"]
-
 	// create s3bucket, vpc, subnet, certificate, hostedzone
 	return &broker.CreateOutput{
-		Status:  201,
-		Message: "Created",
+		Status:  202,
+		Message: "Accepted",
 		Input:   in,
 		Output: []*broker.Output{
 			{Key: "nameserver", Value: "ns-1,ns-2,ns-3,ns-4"},
@@ -65,4 +66,8 @@ func (b *ProjectBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
 
 func (b *ProjectBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
 	return &broker.UnbindingOutput{}
+}
+
+func (b *ProjectBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
+	return &broker.StatusOutput{}
 }

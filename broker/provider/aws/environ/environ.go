@@ -24,14 +24,18 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{"aws_project"},
 		Bindable: true,
+		ParameterSpec: []*broker.ParamSpec{
+			{Name: "project_name", Required: true},
+			{Name: "environ_name", Required: true},
+		},
 	}
 }
 
 func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	// create securitygroup, iam
 	return &broker.CreateOutput{
-		Status:  201,
-		Message: "Created",
+		Status:  202,
+		Message: "Accepted",
 		Input:   in,
 		Output:  []*broker.Output{},
 	}
@@ -55,4 +59,8 @@ func (b *EnvironBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
 
 func (b *EnvironBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
 	return &broker.UnbindingOutput{}
+}
+
+func (b *EnvironBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
+	return &broker.StatusOutput{}
 }

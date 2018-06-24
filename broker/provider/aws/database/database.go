@@ -22,20 +22,22 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 			"aws",
 			"database",
 		},
-		Require:  []string{"aws_project"},
+		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: true,
+		ParameterSpec: []*broker.ParamSpec{
+			{Name: "project_name", Required: true},
+			{Name: "environ_name", Required: true},
+			{Name: "instance_name", Required: true},
+			{Name: "master_username", Required: true},
+			{Name: "master_password", Required: true},
+		},
 	}
 }
 
 func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// in.Parameter["project_name"]
-	// in.Parameter["environment"]
-	// in.Parameter["instance_name"]
-	// in.Parameter["master_username"]
-	// in.Parameter["master_password"]
 	return &broker.CreateOutput{
-		Status:  201,
-		Message: "Created",
+		Status:  202,
+		Message: "Accepted",
 		Input:   in,
 		Output: []*broker.Output{
 			{Key: "username", Value: "foobar"},
@@ -64,4 +66,8 @@ func (b *DatabaseBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingO
 	// sg := in.Parameter["securitygroup_id"]
 	// Delete sg from database_sg
 	return &broker.UnbindingOutput{}
+}
+
+func (b *DatabaseBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
+	return &broker.StatusOutput{}
 }
