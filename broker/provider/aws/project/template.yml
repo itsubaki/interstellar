@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:
+  AWS Project
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  DomainName:
+    Description: "without dot"
+    Type: String
+  CidrBlock:
+    Description: ""
+    Type: String
+
+Outputs:
+  ProjectName:
+    Value: !Ref ProjectName
+  CidrBlock:
+    Value: !Ref CidrBlock
+    Export:
+      Name: !Sub ${ProjectName}-CidrBlock
+  DomainName:
+    Value: !Ref DomainName
+    Export:
+      Name: !Sub ${ProjectName}-DomainName
+  Certificate:
+    Value: !Ref Certificate
+    Export:
+      Name: !Sub ${ProjectName}-Certificate
+  BucketDeploy:
+    Value: !Sub s3://deploy.${ProjectName}.${DomainName}
+    Export:
+      Name: !Sub ${ProjectName}-Bucket-Deploy
+  BucketLog:
+    Value: !Sub s3://log.${ProjectName}.${DomainName}
+    Export:
+      Name: !Sub ${ProjectName}-Bucket-Log
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}.vpc
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  PublicRouteTable:
+  PrivateRouteTable:
+  InternetGateway:
+  InternetGatewayAttach:
+  Route:
+
+  PublicSubnetA:
+  PublicSubnetARouteTable:
+
+  PublicSubnetB:
+  PublicSubnetBRouteTable:
+
+  PublicSubnetC:
+  PublicSubnetCRouteTable:
+
+  PrivateSubnetA:
+  PrivateSubnetARouteTable:
+
+  PrivateSubnetB:
+  PrivateSubnetBRouteTable:
+
+  PrivateSubnetC:
+  PrivateSubnetCRouteTable:

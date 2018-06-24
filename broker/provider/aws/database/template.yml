@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:
+  AWS Database
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  EnvironName:
+    Description: ""
+    Type: String
+  InstanceName:
+    Description: ""
+    Type: String
+  MasterUsername:
+    Description: ""
+    Type: String
+  MasterPassword:
+    Description: ""
+    Type: String
+
+Outputs:
+  ProjectName:
+    Value: !Ref ProjectName
+  EnvironName:
+    Value: !Ref EnvironName
+  InstanceName:
+    Value: !Ref InstanceName
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}
+  ReadEndpoint:
+    Value: !Sub
+      - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
+      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-ReadEndpoint
+  WriteEndpoint:
+    Value: !Sub
+      - ${EnvironName}-${InstanceName}.write.${ProjectName}.${DomainName}
+      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-WriteEndpoint

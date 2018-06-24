@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:
+  AWS Environment
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  EnvironName:
+    Description: ""
+    Type: String
+
+Outputs:
+  ProjectName:
+    Value: !Ref ProjectName
+  EnvironName:
+    Value: !Ref EnvironName
+  PublicSecurityGroup:
+    Value: !Ref PublicSecurityGroup
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-PublicSecurityGroup
+  PrivateSecurityGroup:
+    Value: !Ref PrivateSecurityGroup
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-PrivateSecurityGroup
+  IAMEC2:
+    Value: !Ref IAMEC2
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-IAMEC2
+
+
+Resources:
+  PublicSecurityGroup:
+
+  PrivateSecurityGroup:
+
+  IAMEC2:

@@ -46,7 +46,6 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	out["nameserver"] = "ns-1,ns-2,ns-3,ns-4"
 	out["bucket_log"] = "s3://log.${project_name}.${domain}"
 	out["bucket_deploy"] = "s3://deploy.${project_name}.${domain}"
-	out["bucket_config"] = "s3://config.${project_name}.${domain}"
 
 	return &broker.CreateOutput{
 		Status:  202,
