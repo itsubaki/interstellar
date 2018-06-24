@@ -53,26 +53,16 @@ type ParamSpec struct {
 	Description  string   `json:"description"`
 }
 
-type Parameter struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type Output struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 type CreateInput struct {
-	InstanceID string       `json:"instance_id"`
-	Parameter  []*Parameter `json:"parameter"`
+	InstanceID string            `json:"instance_id"`
+	Parameter  map[string]string `json:"parameter"`
 }
 
 type CreateOutput struct {
-	Status  int          `json:"status"`
-	Message string       `json:"message"`
-	Input   *CreateInput `json:"input"`
-	Output  []*Output    `json:"output"`
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Input   *CreateInput      `json:"input"`
+	Output  map[string]string `json:"output"`
 }
 
 type DeleteInput struct {
@@ -86,27 +76,27 @@ type DeleteOutput struct {
 }
 
 type UpdateInput struct {
-	InstanceID string       `json:"instance_id"`
-	Parameter  []*Parameter `json:"parameter"`
+	InstanceID string            `json:"instance_id"`
+	Parameter  map[string]string `json:"parameter"`
 }
 
 type UpdateOutput struct {
-	Status  int          `json:"status"`
-	Message string       `json:"message"`
-	Input   *UpdateInput `json:"input"`
-	Output  []*Output    `json:"output"`
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Input   *UpdateInput      `json:"input"`
+	Output  map[string]string `json:"output"`
 }
 
 type BindingInput struct {
-	InstanceID string       `json:"instance_id"`
-	Parameter  []*Parameter `json:"parameter"`
+	InstanceID string            `json:"instance_id"`
+	Parameter  map[string]string `json:"parameter"`
 }
 
 type BindingOutput struct {
-	Status  int          `json:"status"`
-	Message string       `json:"message"`
-	Input   *UpdateInput `json:"input"`
-	Output  []*Output    `json:"output"`
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Input   *UpdateInput      `json:"input"`
+	Output  map[string]string `json:"output"`
 }
 
 type UnbindingInput struct {

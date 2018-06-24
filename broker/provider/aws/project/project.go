@@ -33,18 +33,26 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 	}
 }
 
+// create s3bucket, vpc, subnet, certificate, hostedzone
+// ExportName is related with project_name
+// ExportValue
+//  - integration_role_arn
+//  - cidr
+//  - subnet
+//  - domain
+//  - bucket_name
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// create s3bucket, vpc, subnet, certificate, hostedzone
+	out := make(map[string]string)
+	out["nameserver"] = "ns-1,ns-2,ns-3,ns-4"
+	out["bucket_log"] = "s3://log.${project_name}.${domain}"
+	out["bucket_deploy"] = "s3://deploy.${project_name}.${domain}"
+	out["bucket_config"] = "s3://config.${project_name}.${domain}"
+
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
 		Input:   in,
-		Output: []*broker.Output{
-			{Key: "nameserver", Value: "ns-1,ns-2,ns-3,ns-4"},
-			{Key: "bucket_log", Value: "s3://log.${project_name}.${domain}"},
-			{Key: "bucket_deploy", Value: "s3://deploy.${project_name}.${domain}"},
-			{Key: "bucket_config", Value: "s3://config.${project_name}.${domain}"},
-		},
+		Output:  out,
 	}
 }
 

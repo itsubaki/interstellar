@@ -34,17 +34,22 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 	}
 }
 
+// ExportName is related with project_name, environ_name, instance_name
+// ExportValue
+//  - master_username
+//  - master_password
+//  - endpoint_write
+//  - endpoint_read
 func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
+	out := make(map[string]string)
+	out["endpoint_write"] = "db://${environ}-${instance_name}.write.${project_name}.${domain}"
+	out["endpoint_read"] = "db://${environ}-${instance_name}.read.${project_name}.${domain}"
+
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
 		Input:   in,
-		Output: []*broker.Output{
-			{Key: "username", Value: "foobar"},
-			{Key: "password", Value: "hogehoge"},
-			{Key: "endpoint_write", Value: "db://${environ}-${instance_name}.write.${project_name}.${domain}"},
-			{Key: "endpoint_read", Value: "db://${environ}-${instance_name}.read.${project_name}.${domain}"},
-		},
+		Output:  out,
 	}
 }
 

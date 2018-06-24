@@ -34,14 +34,18 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 	}
 }
 
+// ExportName is related with project_name, environ_name, instance_name
+// ExportValue
+//  - endpoint
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
+	out := make(map[string]string)
+	out["endpoint"] = "https://${environ}-${instance_name}.${project_name}.{domain}"
+
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
 		Input:   in,
-		Output: []*broker.Output{
-			{Key: "endpoint", Value: "https://${environ}-${instance_name}.${project_name}.{domain}"},
-		},
+		Output:  out,
 	}
 }
 

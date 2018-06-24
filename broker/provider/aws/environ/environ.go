@@ -31,13 +31,17 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 	}
 }
 
+// ExportName is related with project_name, environ_name
+// ExportValue
+//  - security_group
+//  - iam
 func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// create securitygroup, iam
+	out := make(map[string]string)
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
 		Input:   in,
-		Output:  []*broker.Output{},
+		Output:  out,
 	}
 }
 
