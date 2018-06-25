@@ -11,7 +11,7 @@ func NewProjectBroker() *ProjectBroker {
 
 func (b *ProjectBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9084",
+		Port: ":8080",
 	}
 }
 
@@ -33,19 +33,9 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 	}
 }
 
-// create s3bucket, vpc, subnet, certificate, hostedzone
-// ExportName is related with project_name
-// ExportValue
-//  - integration_role_arn
-//  - cidr
-//  - subnet
-//  - domain
-//  - bucket_name
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	out := make(map[string]string)
 	out["nameserver"] = "ns-1,ns-2,ns-3,ns-4"
-	out["bucket_log"] = "s3://log.${project_name}.${domain}"
-	out["bucket_deploy"] = "s3://deploy.${project_name}.${domain}"
 
 	return &broker.CreateOutput{
 		Status:  202,

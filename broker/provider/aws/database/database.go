@@ -11,7 +11,7 @@ func NewDatabaseBroker() *DatabaseBroker {
 
 func (b *DatabaseBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9082",
+		Port: ":8080",
 	}
 }
 

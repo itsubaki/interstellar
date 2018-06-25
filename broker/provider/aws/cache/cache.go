@@ -11,7 +11,7 @@ func NewCacheBroker() *CacheBroker {
 
 func (b *CacheBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9080",
+		Port: ":8080",
 	}
 }
 

@@ -11,7 +11,7 @@ func NewComputeBroker() *ComputeBroker {
 
 func (b *ComputeBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9081",
+		Port: ":8080",
 	}
 }
 

@@ -11,7 +11,7 @@ func NewEnvironBroker() *EnvironBroker {
 
 func (b *EnvironBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":9083",
+		Port: ":8080",
 	}
 }
 
@@ -31,10 +31,6 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 	}
 }
 
-// ExportName is related with project_name, environ_name
-// ExportValue
-//  - security_group
-//  - iam
 func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	out := make(map[string]string)
 	return &broker.CreateOutput{
