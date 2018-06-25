@@ -17,31 +17,31 @@ Parameters:
   CidrBlock:
     Description: ""
     Type: String
-    Default: "10.1.0.0/16"
+    Default: 10.1.0.0/16
   CidrBlockPublicPrimary:
     Description: ""
     Type: String
-    Default: "10.1.10.0/24"
+    Default: 10.1.10.0/24
   CidrBlockPublicSecondary:
     Description: ""
     Type: String
-    Default: "10.1.11.0/24"
+    Default: 10.1.11.0/24
   CidrBlockPublicTertiary:
     Description: ""
     Type: String
-    Default: "10.1.12.0/24"
+    Default: 10.1.12.0/24
   CidrBlockPrivatePrimary:
     Description: ""
     Type: String
-    Default: "10.1.20.0/24"
+    Default: 10.1.20.0/24
   CidrBlockPrivateSecondary:
     Description: ""
     Type: String
-    Default: "10.1.21.0/24"
+    Default: 10.1.21.0/24
   CidrBlockPrivateTertiary:
     Description: ""
     Type: String
-    Default: "10.1.22.0/24"
+    Default: 10.1.22.0/24
 
 Outputs:
   ProjectName:
@@ -61,31 +61,31 @@ Outputs:
   VPC:
     Value: !Ref VPC
     Export:
-      Name: !Sub "${ProjectName}-VPC"
+      Name: !Sub ${ProjectName}-VPC
   AccountId:
     Value: !Ref AccountId
     Export:
-      Name: !Sub "${ProjectName}-AccountId"
+      Name: !Sub ${ProjectName}-AccountId
   PublicSubnetPrimary:
     Value: !Ref PublicSubnetPrimary
     Export:
-      Name: !Sub "${ProjectName}-PublicSubnetPrimary"
+      Name: !Sub ${ProjectName}-PublicSubnetPrimary
   PublicSubnetSecondary:
     Value: !Ref PublicSubnetSecondary
     Export:
-      Name: !Sub "${ProjectName}-PublicSubnetSecondary"
+      Name: !Sub ${ProjectName}-PublicSubnetSecondary
   PublicSubnetTertiary:
     Value: !Ref PublicSubnetTertiary
     Export:
-      Name: !Sub "${ProjectName}-PublicSubnetTertiary"
+      Name: !Sub ${ProjectName}-PublicSubnetTertiary
   NameServer:
     Value: !Join
       - " "
       -
-        - !Select [ "0", !GetAtt HostedZone.NameServers ]
-        - !Select [ "1", !GetAtt HostedZone.NameServers ]
-        - !Select [ "2", !GetAtt HostedZone.NameServers ]
-        - !Select [ "3", !GetAtt HostedZone.NameServers ]
+        - !Select [ 0, !GetAtt HostedZone.NameServers ]
+        - !Select [ 1, !GetAtt HostedZone.NameServers ]
+        - !Select [ 2, !GetAtt HostedZone.NameServers ]
+        - !Select [ 3, !GetAtt HostedZone.NameServers ]
 
 Resources:
   VPC:
@@ -106,7 +106,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.public"
+          Value: !Sub ${ProjectName}.public
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -116,7 +116,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.private"
+          Value: !Sub ${ProjectName}.private
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -125,7 +125,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.igw"
+          Value: !Sub ${ProjectName}.igw
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -146,7 +146,7 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref VPC
-      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       RouteTableIds:
         - !Ref PublicRoute
         - !Ref PrivateRoute
@@ -156,11 +156,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPublicPrimary
-      AvailabilityZone: !Select [ "0", !GetAZs ""]
+      AvailabilityZone: !Select [ 0, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.public.primary"
+          Value: !Sub ${ProjectName}.public.primary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -169,11 +169,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPublicSecondary
-      AvailabilityZone: !Select [ "1", !GetAZs ""]
+      AvailabilityZone: !Select [ 1, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.public.secondary"
+          Value: !Sub ${ProjectName}.public.secondary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -182,11 +182,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPublicTertiary
-      AvailabilityZone: !Select [ "2", !GetAZs ""]
+      AvailabilityZone: !Select [ 2, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.public.tertiary"
+          Value: !Sub ${ProjectName}.public.tertiary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -195,11 +195,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPrivatePrimary
-      AvailabilityZone: !Select [ "0", !GetAZs ""]
+      AvailabilityZone: !Select [ 0, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.private.primary"
+          Value: !Sub ${ProjectName}.private.primary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -208,11 +208,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPrivateSecondary
-      AvailabilityZone: !Select [ "1", !GetAZs ""]
+      AvailabilityZone: !Select [ 1, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.private.secondary"
+          Value: !Sub ${ProjectName}.private.secondary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -221,11 +221,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref CidrBlockPrivateTertiary
-      AvailabilityZone: !Select [ "2", !GetAZs ""]
+      AvailabilityZone: !Select [ 2, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.private.tertiary"
+          Value: !Sub ${ProjectName}.private.tertiary
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -270,26 +270,26 @@ Resources:
     Properties:
       HostedZoneConfig:
         Comment: ""
-      Name: !Sub "${ProjectName}.${DomainName}."
+      Name: !Sub ${ProjectName}.${DomainName}.
 
   Certificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: !Sub "*.${ProjectName}.${DomainName}"
+      DomainName: !Sub *.${ProjectName}.${DomainName}
       DomainValidationOptions:
-        - DomainName: !Sub "*.${ProjectName}.${DomainName}"
+        - DomainName: !Sub *.${ProjectName}.${DomainName}
           ValidationDomain: !Ref DomainName
       SubjectAlternativeNames:
-        - !Sub "${ProjectName}.${DomainName}"
+        - !Sub ${ProjectName}.${DomainName}
 
   S3BucketLog:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub "log.${ProjectName}.${DomainName}"
+      BucketName: !Sub log.${ProjectName}.${DomainName}
       Tags:
         - Key: Name
-          Value: !Sub "log.${ProjectName}.${DomainName}"
+          Value: !Sub log.${ProjectName}.${DomainName}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -301,36 +301,36 @@ Resources:
     Properties:
       Bucket: !Ref S3BucketLog
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-          - Sid: "AWSCloudTrailAclCheck"
-            Effect: "Allow"
+          - Sid: AWSCloudTrailAclCheck
+            Effect: Allow
             Principal:
-              Service: "cloudtrail.amazonaws.com"
-            Action: "s3:GetBucketAcl"
-            Resource: !Sub "arn:aws:s3:::${S3BucketLog}"
-          - Sid: "AWSCloudTrailWrite"
-            Effect: "Allow"
+              Service: cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !Sub arn:aws:s3:::${S3BucketLog}
+          - Sid: AWSCloudTrailWrite
+            Effect: Allow
             Principal:
-              Service: "cloudtrail.amazonaws.com"
-            Action: "s3:PutObject"
-            Resource: !Sub "arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*"
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
             Condition:
               StringEquals:
-                s3:x-amz-acl: "bucket-owner-full-control"
+                s3:x-amz-acl: bucket-owner-full-control
 
   CloudTrail:
-    DependsOn: "BucketPolicy"
-    Type: "AWS::CloudTrail::Trail"
+    DependsOn: BucketPolicy
+    Type: AWS::CloudTrail::Trail
     Properties:
-      S3BucketName: !Sub "log.${ProjectName}.${DomainName}"
+      S3BucketName: !Sub log.${ProjectName}.${DomainName}
       IncludeGlobalServiceEvents: true
       EnableLogFileValidation: true
       IsMultiRegionTrail: true
       IsLogging: true
       Tags:
         - Key: Name
-          Value: !Sub "log.${ProjectName}.${DomainName}"
+          Value: !Sub log.${ProjectName}.${DomainName}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName

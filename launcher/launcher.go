@@ -30,6 +30,7 @@ func Run(l Launcher) {
 		c.JSON(out.Status, out)
 	})
 
+	log.Printf("%v\n", l.Config())
 	if err := g.Run(l.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)
 	}

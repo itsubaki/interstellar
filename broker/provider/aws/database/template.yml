@@ -43,22 +43,21 @@ Outputs:
       Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-WriteEndpoint
 
 Resources:
-  # binding?
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
       SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
-      IpProtocol: "tcp"
-      FromPort: "3306"
-      ToPort: "3306"
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
 
   ParameterStoreEndpoint:
-    Type: "AWS::SSM::Parameter"
+    Type: AWS::SSM::Parameter
     Properties:
       Description: InternalEndpoint
       Type: String
-      Name: !Sub "${ProjectName}_${EnvironName}_database_endpoint_read"
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_endpoint_read
       Value: !Sub
         - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}

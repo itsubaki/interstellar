@@ -58,14 +58,10 @@ func (b *DatabaseBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 }
 
 func (b *DatabaseBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
-	// sg := in.Parameter["securitygroup_id"]
-	// Add sg with 3306 to database_sg
 	return &broker.BindingOutput{}
 }
 
 func (b *DatabaseBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
-	// sg := in.Parameter["securitygroup_id"]
-	// Delete sg from database_sg
 	return &broker.UnbindingOutput{}
 }
 

@@ -29,6 +29,7 @@ func Run(b ServiceBroker) {
 		c.JSON(out.Status, out)
 	})
 
+	log.Printf("%v\n", b.Config())
 	if err := g.Run(b.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)
 	}

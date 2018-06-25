@@ -28,46 +28,46 @@ Outputs:
     Value: !Ref BackendSecurityGroup
     Export:
       Name: !Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup
-  InstanceProfile:
-    Value: !Ref InstanceProfile
+  EC2InstanceProfile:
+    Value: !Ref EC2InstanceProfile
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-InstanceProfile
+      Name: !Sub ${ProjectName}-${EnvironName}-EC2InstanceProfile
 
 Resources:
   InternetFacingSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "PublicSecurityGroup"
+      GroupDescription: PublicSecurityGroup
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.${EnvironName}.internet-facing"
+          Value: !Sub ${ProjectName}.${EnvironName}.internet-facing
         - Key: ProjectName
           Value: !Ref ProjectName
 
   ApplicationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "ApplicationSecurityGroup"
+      GroupDescription: ApplicationSecurityGroup
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.${EnvironName}.application"
+          Value: !Sub ${ProjectName}.${EnvironName}.application
         - Key: ProjectName
           Value: !Ref ProjectName
 
   BackendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "PrivateSecurityGroup"
+      GroupDescription: PrivateSecurityGroup
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}.${EnvironName}.backend"
+          Value: !Sub ${ProjectName}.${EnvironName}.backend
         - Key: ProjectName
           Value: !Ref ProjectName
 
-  InstanceProfile:
+  EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
@@ -78,9 +78,9 @@ Resources:
   ReadOnlyIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${EnvironName}-readonly.${ProjectName}"
+      RoleName: !Sub ${EnvironName}-readonly.${ProjectName}
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action:
@@ -94,9 +94,9 @@ Resources:
   RunCommandIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${EnvironName}-runcommand.${ProjectName}"
+      RoleName: !Sub ${EnvironName}-runcommand.${ProjectName}
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action:
@@ -109,9 +109,9 @@ Resources:
   S3BucketIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${EnvironName}-s3bucket.${ProjectName}"
+      RoleName: !Sub ${EnvironName}-s3bucket.${ProjectName}
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action:
@@ -119,12 +119,12 @@ Resources:
             Principal:
               - ec2.amazonaws.com
       Policies:
-        PolicyName: !Sub "${EnvironName}-s3bucket.${ProjectName}"
+        PolicyName: !Sub ${EnvironName}-s3bucket.${ProjectName}
         PolicyDocument:
-          Version: "2012-10-17"
+          Version: 2012-10-17
           Statement:
             - Effect: Allow
-              Action: "s3:*"
+              Action: s3:*
               Resource:
                 - !Sub
                   - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}
@@ -136,9 +136,9 @@ Resources:
   LoadBalancerIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${EnvironName}-loadbalancer.${ProjectName}"
+      RoleName: !Sub ${EnvironName}-loadbalancer.${ProjectName}
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action:
@@ -146,9 +146,9 @@ Resources:
             Principal:
               - ec2.amazonaws.com
       Policies:
-        PolicyName: !Sub "${EnvironName}-loadbalancer.${ProjectName}"
+        PolicyName: !Sub ${EnvironName}-loadbalancer.${ProjectName}
         PolicyDocument:
-          Version: "2012-10-17"
+          Version: 2012-10-17
           Statement:
             - Effect: Allow
               Action:
@@ -167,7 +167,7 @@ Resources:
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironName}-log.${ProjectName}.${DomainName}"
+          Value: !Sub ${EnvironName}-log.${ProjectName}.${DomainName}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -179,18 +179,18 @@ Resources:
     Properties:
       Bucket: !Ref S3BucketLog
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-          - Sid: "ALBLogBucketPolicy"
-            Effect: "Allow"
+          - Sid: ALBLogBucketPolicy
+            Effect: Allow
             Principal:
               AWS:
-                - "582318560864" # ap-northeast-1
-                - "127311923021" # us-east-1
-                - "033677994240" # us-east-2
-                - "027434742980" # us-west-1
-                - "797873946194" # us-west-2
-            Action: "s3:PutObject"
+                - 582318560864 # ap-northeast-1
+                - 127311923021 # us-east-1
+                - 033677994240 # us-east-2
+                - 027434742980 # us-west-1
+                - 797873946194 # us-west-2
+            Action: s3:PutObject
             Resource: !Sub
               - arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
               - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}

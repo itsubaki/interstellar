@@ -13,6 +13,36 @@ Parameters:
   InstanceName:
     Description: ""
     Type: String
+  InstanceType:
+    Description: ""
+    Type: String
+    Default: t2.nano
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.12xlarge
+      - m5.24xlarge
+  MaxSize:
+    Description: ""
+    Type: String
+    Default: 1
+  MinSize:
+    Description: ""
+    Type: String
+    Default: 1
+  DesiredCapacity:
+    Description: ""
+    Type: String
+    Default: 1
 
 Resources:
   LoadBalancer:
@@ -36,7 +66,7 @@ Resources:
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetTertiary" }
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}-${EnvironName}-${InstanceName}"
+          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -52,7 +82,7 @@ Resources:
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectName}-${EnvironName}-${InstanceName}"
+          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -64,8 +94,8 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
-      Port: "443"
-      Protocol: "HTTPS"
+      Port: 443
+      Protocol: HTTPS
       Certificates:
         - CertificateArn: { "Fn::ImportValue": !Sub "${ProjectName}-Certificate" }
       DefaultActions:
@@ -82,21 +112,21 @@ Resources:
       Conditions:
         - Field: path-pattern
           Values:
-            - "/"
+            - /
       Priority: 1
 
   LaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       ImageId: ami-0d74386b
-      InstanceType: t2.small
+      InstanceType: !Ref InstanceType
       KeyName: !Ref ProjectName
       IamInstanceProfile: { "Fn::ImportValue": !Sub "${ProjectName}-${EnvironName}-InstanceProfile" }
       BlockDeviceMappings:
-        - DeviceName: "/dev/sda1"
+        - DeviceName: /dev/sda1
           Ebs:
             DeleteOnTermination: true
-            VolumeType: "gp2"
+            VolumeType: gp2
             VolumeSize: 30
       SecurityGroups:
         - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
@@ -111,14 +141,14 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Count:   !Ref InstanceNum
-        Timeout: "PT20M"
+        Timeout: PT20M
       AutoScalingCreationPolicy:
         MinSuccessfulInstancesPercent: 80
     Properties:
       LaunchConfigurationName: !Ref LaunchConfig
-      DesiredCapacity: 1
-      MaxSize: 1
-      MinSize: 1
+      DesiredCapacity: !Ref DesiredCapacity
+      MaxSize: !Ref MaxSize
+      MinSize: !Ref MinSize
       TargetGroupARNs:
         - !Ref TargetGroup
       VPCZoneIdentifier:

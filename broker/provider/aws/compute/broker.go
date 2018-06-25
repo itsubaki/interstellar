@@ -60,6 +60,10 @@ func (b *ComputeBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 }
 
 func (b *ComputeBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
+	// project_name
+	// environ_name
+	// instance_name
+	// run_command -> docker environment
 	return &broker.BindingOutput{}
 }
 

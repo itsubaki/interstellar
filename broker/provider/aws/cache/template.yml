@@ -36,16 +36,16 @@ Resources:
     Properties:
       GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
       SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
-      IpProtocol: "tcp"
-      FromPort: "6379"
-      ToPort: "6379"
+      IpProtocol: tcp
+      FromPort: 6379
+      ToPort: 6379
 
   ParameterStoreEndpoint:
-    Type: "AWS::SSM::Parameter"
+    Type: AWS::SSM::Parameter
     Properties:
       Description: InternalEndpoint
       Type: String
-      Name: !Sub "${ProjectName}_${EnvironName}_elasticache_endpoint"
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_elasticache_endpoint
       Value: !Sub
         - ${EnvironName}-${InstanceName}.elasticache.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
