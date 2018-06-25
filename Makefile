@@ -12,7 +12,7 @@ build:
 	cd broker/provider/aws/compute;  docker build -t broker.aws.compute:${HASH} .
 	docker images
 
-up:
+up: build
 	set -x
 
 	docker run -d --rm -p 9080:8080 --name project  broker.aws.project:${HASH}
@@ -36,6 +36,12 @@ catalog:
 	curl -s localhost:9082/v1/catalog | jq .
 	curl -s localhost:9083/v1/catalog | jq .
 	curl -s localhost:9084/v1/catalog | jq .
+
+
+clean:
+	set -x
+
+	docker images -aq | xargs docker rmi --force
 
 build-bin:
 	set -x
