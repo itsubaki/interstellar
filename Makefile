@@ -11,6 +11,8 @@ build:
 	cd broker/provider/aws/database; docker build -t broker.aws.database:${HASH} .
 	cd broker/provider/aws/cache;    docker build -t broker.aws.cache:${HASH} .
 	cd broker/provider/aws/compute;  docker build -t broker.aws.compute:${HASH} .
+
+	docker image prune -f
 	docker images
 
 up:
@@ -56,5 +58,6 @@ package:
 	cd broker/provider/aws/database; go build -o ${BUILD}/broker/database/bin/database
 	cd broker/provider/aws/cache;    go build -o ${BUILD}/broker/cache/bin/cache
 	cd broker/provider/aws/compute;  go build -o ${BUILD}/broker/compute/bin/compute
+
 
 .PHONY:
