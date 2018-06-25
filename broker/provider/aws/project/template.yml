@@ -78,6 +78,14 @@ Outputs:
     Value: !Ref PublicSubnetTertiary
     Export:
       Name: !Sub "${ProjectName}-PublicSubnetTertiary"
+  NameServer:
+    Value: !Join
+      - " "
+      -
+        - !Select [ "0", !GetAtt HostedZone.NameServers ]
+        - !Select [ "1", !GetAtt HostedZone.NameServers ]
+        - !Select [ "2", !GetAtt HostedZone.NameServers ]
+        - !Select [ "3", !GetAtt HostedZone.NameServers ]
 
 Resources:
   VPC:

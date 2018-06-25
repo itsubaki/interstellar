@@ -12,7 +12,7 @@ build:
 	cd broker/provider/aws/compute;  docker build -t broker.aws.compute:${HASH} .
 	docker images
 
-up: build
+up:
 	set -x
 
 	docker run -d --rm -p 9080:8080 --name project  broker.aws.project:${HASH}
