@@ -12,7 +12,6 @@ build:
 	cd broker/provider/aws/cache;    docker build -t broker.aws.cache:${HASH} .
 	cd broker/provider/aws/compute;  docker build -t broker.aws.compute:${HASH} .
 
-	docker image prune -f
 	docker images
 
 up:
