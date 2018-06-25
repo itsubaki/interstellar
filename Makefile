@@ -5,12 +5,12 @@ BUILD := ${PWD}/_build
 build:
 	set -x
 
-	cd launcher/interstellar;        docker build --no-cache=true -t interstellar:${HASH} .
-	cd broker/provider/aws/project;  docker build --no-cache=true -t broker.aws.project:${HASH} .
-	cd broker/provider/aws/environ;  docker build --no-cache=true -t broker.aws.environ:${HASH} .
-	cd broker/provider/aws/database; docker build --no-cache=true -t broker.aws.database:${HASH} .
-	cd broker/provider/aws/cache;    docker build --no-cache=true -t broker.aws.cache:${HASH} .
-	cd broker/provider/aws/compute;  docker build --no-cache=true -t broker.aws.compute:${HASH} .
+	cd launcher/interstellar;        docker build -t interstellar:${HASH} .
+	cd broker/provider/aws/project;  docker build -t broker.aws.project:${HASH} .
+	cd broker/provider/aws/environ;  docker build -t broker.aws.environ:${HASH} .
+	cd broker/provider/aws/database; docker build -t broker.aws.database:${HASH} .
+	cd broker/provider/aws/cache;    docker build -t broker.aws.cache:${HASH} .
+	cd broker/provider/aws/compute;  docker build -t broker.aws.compute:${HASH} .
 	docker images
 
 up:

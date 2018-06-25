@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsubaki/interstellar/broker"
 	"github.com/itsubaki/interstellar/launcher"
+	"github.com/itsubaki/interstellar/util"
 )
 
 type Interstellar struct {
@@ -20,7 +21,7 @@ func NewInterstellar() *Interstellar {
 
 func (i *Interstellar) Config() *launcher.Config {
 	return &launcher.Config{
-		Port: ":8080",
+		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 

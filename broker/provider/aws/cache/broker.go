@@ -1,6 +1,9 @@
 package main
 
-import "github.com/itsubaki/interstellar/broker"
+import (
+	"github.com/itsubaki/interstellar/broker"
+	"github.com/itsubaki/interstellar/util"
+)
 
 type CacheBroker struct {
 }
@@ -11,7 +14,7 @@ func NewCacheBroker() *CacheBroker {
 
 func (b *CacheBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":8080",
+		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 

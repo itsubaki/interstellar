@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/itsubaki/interstellar/broker"
+	"github.com/itsubaki/interstellar/util"
 )
 
 type ComputeBroker struct {
@@ -13,7 +14,7 @@ func NewComputeBroker() *ComputeBroker {
 
 func (b *ComputeBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":8080",
+		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 
