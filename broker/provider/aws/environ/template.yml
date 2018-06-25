@@ -16,23 +16,181 @@ Outputs:
     Value: !Ref ProjectName
   EnvironName:
     Value: !Ref EnvironName
-  PublicSecurityGroup:
-    Value: !Ref PublicSecurityGroup
+  InternetFacingSecurityGroup:
+    Value: !Ref InternetFacingSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-PublicSecurityGroup
-  PrivateSecurityGroup:
-    Value: !Ref PrivateSecurityGroup
+      Name: !Sub ${ProjectName}-${EnvironName}-InternetFacingSecurityGroup
+  ApplicationSecurityGroup:
+    Value: !Ref ApplicationSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-PrivateSecurityGroup
-  IAMEC2:
-    Value: !Ref IAMEC2
+      Name: !Sub ${ProjectName}-${EnvironName}-ApplicationSecurityGroup
+  BackendSecurityGroup:
+    Value: !Ref BackendSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-IAMEC2
-
+      Name: !Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup
+  InstanceProfile:
+    Value: !Ref InstanceProfile
+    Export:
+      Name: !Sub ${ProjectName}-${EnvironName}-InstanceProfile
 
 Resources:
-  PublicSecurityGroup:
+  InternetFacingSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "PublicSecurityGroup"
+      VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.${EnvironName}.internet-facing"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  PrivateSecurityGroup:
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "ApplicationSecurityGroup"
+      VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.${EnvironName}.application"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  IAMEC2:
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "PrivateSecurityGroup"
+      VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.${EnvironName}.backend"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref ReadOnlyIAMRole
+        - !Ref RunCommandIAMRole
+        - !Ref S3S3BucketIAMRole
+
+  ReadOnlyIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironName}-readonly.${ProjectName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+
+  RunCommandIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironName}-runcommand.${ProjectName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+
+  S3BucketIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironName}-s3bucket.${ProjectName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      Policies:
+        PolicyName: !Sub "${EnvironName}-s3bucket.${ProjectName}"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: "s3:*"
+              Resource:
+                - !Sub
+                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}
+                  - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+                - !Sub
+                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}/*
+                  - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  LoadBalancerIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironName}-loadbalancer.${ProjectName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      Policies:
+        PolicyName: !Sub "${EnvironName}-loadbalancer.${ProjectName}"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:*
+                - autoscaling:*
+                - elasticloadbalancing:*
+                - cloudwatch:GetMetricStatistics
+              Resource: *
+
+  S3BucketLog:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub
+        - ${EnvironName}-log.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironName}-log.${ProjectName}.${DomainName}"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+
+  S3BucketLogPolicy:
+    DependsOn: S3BucketLog
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3BucketLog
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "ALBLogBucketPolicy"
+            Effect: "Allow"
+            Principal:
+              AWS:
+                - "582318560864" # ap-northeast-1
+                - "127311923021" # us-east-1
+                - "033677994240" # us-east-2
+                - "027434742980" # us-west-1
+                - "797873946194" # us-west-2
+            Action: "s3:PutObject"
+            Resource: !Sub
+              - arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
+              - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}

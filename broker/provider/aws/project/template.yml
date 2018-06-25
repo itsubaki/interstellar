@@ -8,11 +8,40 @@ Parameters:
     Description: ""
     Type: String
   DomainName:
-    Description: "without dot"
+    Description: ""
     Type: String
+  AccountId:
+    Description: ""
+    Type: String
+    Default: ""
   CidrBlock:
     Description: ""
     Type: String
+    Default: "10.1.0.0/16"
+  CidrBlockPublicPrimary:
+    Description: ""
+    Type: String
+    Default: "10.1.10.0/24"
+  CidrBlockPublicSecondary:
+    Description: ""
+    Type: String
+    Default: "10.1.11.0/24"
+  CidrBlockPublicTertiary:
+    Description: ""
+    Type: String
+    Default: "10.1.12.0/24"
+  CidrBlockPrivatePrimary:
+    Description: ""
+    Type: String
+    Default: "10.1.20.0/24"
+  CidrBlockPrivateSecondary:
+    Description: ""
+    Type: String
+    Default: "10.1.21.0/24"
+  CidrBlockPrivateTertiary:
+    Description: ""
+    Type: String
+    Default: "10.1.22.0/24"
 
 Outputs:
   ProjectName:
@@ -29,14 +58,26 @@ Outputs:
     Value: !Ref Certificate
     Export:
       Name: !Sub ${ProjectName}-Certificate
-  BucketDeploy:
-    Value: !Sub s3://deploy.${ProjectName}.${DomainName}
+  VPC:
+    Value: !Ref VPC
     Export:
-      Name: !Sub ${ProjectName}-Bucket-Deploy
-  BucketLog:
-    Value: !Sub s3://log.${ProjectName}.${DomainName}
+      Name: !Sub "${ProjectName}-VPC"
+  AccountId:
+    Value: !Ref AccountId
     Export:
-      Name: !Sub ${ProjectName}-Bucket-Log
+      Name: !Sub "${ProjectName}-AccountId"
+  PublicSubnetPrimary:
+    Value: !Ref PublicSubnetPrimary
+    Export:
+      Name: !Sub "${ProjectName}-PublicSubnetPrimary"
+  PublicSubnetSecondary:
+    Value: !Ref PublicSubnetSecondary
+    Export:
+      Name: !Sub "${ProjectName}-PublicSubnetSecondary"
+  PublicSubnetTertiary:
+    Value: !Ref PublicSubnetTertiary
+    Export:
+      Name: !Sub "${ProjectName}-PublicSubnetTertiary"
 
 Resources:
   VPC:
@@ -51,26 +92,238 @@ Resources:
         - Key: ProjectName
           Value: !Ref ProjectName
 
-  PublicRouteTable:
-  PrivateRouteTable:
+  PublicRoute:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.public"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  PrivateRoute:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.private"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
   InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.igw"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
   InternetGatewayAttach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
   Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRoute
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
 
-  PublicSubnetA:
-  PublicSubnetARouteTable:
+  VPCEndpointS3:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      RouteTableIds:
+        - !Ref PublicRoute
+        - !Ref PrivateRoute
 
-  PublicSubnetB:
-  PublicSubnetBRouteTable:
+  PublicSubnetPrimary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPublicPrimary
+      AvailabilityZone: !Select [ "0", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.public.primary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  PublicSubnetC:
-  PublicSubnetCRouteTable:
+  PublicSubnetSecondary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPublicSecondary
+      AvailabilityZone: !Select [ "1", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.public.secondary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  PrivateSubnetA:
-  PrivateSubnetARouteTable:
+  PublicSubnetTertiary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPublicTertiary
+      AvailabilityZone: !Select [ "2", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.public.tertiary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  PrivateSubnetB:
-  PrivateSubnetBRouteTable:
+  PrivateSubnetPrimary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPrivatePrimary
+      AvailabilityZone: !Select [ "0", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.private.primary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
 
-  PrivateSubnetC:
-  PrivateSubnetCRouteTable:
+  PrivateSubnetSecondary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPrivateSecondary
+      AvailabilityZone: !Select [ "1", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.private.secondary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  PrivateSubnetTertiary:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref CidrBlockPrivateTertiary
+      AvailabilityZone: !Select [ "2", !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}.private.tertiary"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  PublicSubnetPrimaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetPrimary
+      RouteTableId: !Ref PublicRoute
+
+  PublicSubnetSecondaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetSecondary
+      RouteTableId: !Ref PublicRoute
+
+  PublicSubnetTertiaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetTertiary
+      RouteTableId: !Ref PublicRoute
+
+  PrivateSubnetPrimaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetPrimary
+      RouteTableId: !Ref PrivateRoute
+
+  PrivateSubnetSecondaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetSecondary
+      RouteTableId: !Ref PrivateRoute
+
+  PrivateSubnetTertiaryRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetTertiary
+      RouteTableId: !Ref PrivateRoute
+
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: ""
+      Name: !Sub "${ProjectName}.${DomainName}."
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub "*.${ProjectName}.${DomainName}"
+      DomainValidationOptions:
+        - DomainName: !Sub "*.${ProjectName}.${DomainName}"
+          ValidationDomain: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub "${ProjectName}.${DomainName}"
+
+  S3BucketLog:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "log.${ProjectName}.${DomainName}"
+      Tags:
+        - Key: Name
+          Value: !Sub "log.${ProjectName}.${DomainName}"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+
+  S3BucketLogPolicy:
+    DependsOn: S3BucketLog
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3BucketLog
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal:
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: !Sub "arn:aws:s3:::${S3BucketLog}"
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal:
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource: !Sub "arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  CloudTrail:
+    DependsOn: "BucketPolicy"
+    Type: "AWS::CloudTrail::Trail"
+    Properties:
+      S3BucketName: !Sub "log.${ProjectName}.${DomainName}"
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+      IsMultiRegionTrail: true
+      IsLogging: true
+      Tags:
+        - Key: Name
+          Value: !Sub "log.${ProjectName}.${DomainName}"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName

@@ -42,8 +42,8 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 //  - endpoint_read
 func (b *DatabaseBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	out := make(map[string]string)
-	out["endpoint_write"] = "db://${environ}-${instance_name}.write.${project_name}.${domain}"
-	out["endpoint_read"] = "db://${environ}-${instance_name}.read.${project_name}.${domain}"
+	out["endpoint_write"] = "${environ}-${instance_name}.write.${project_name}.${domain}"
+	out["endpoint_read"] = "${environ}-${instance_name}.read.${project_name}.${domain}"
 
 	return &broker.CreateOutput{
 		Status:  202,

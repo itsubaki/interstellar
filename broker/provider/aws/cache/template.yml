@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description:
-  AWS Relational Database Service
+  AWS ElastiCache
 
 Parameters:
   ProjectName:
@@ -13,12 +13,6 @@ Parameters:
   InstanceName:
     Description: ""
     Type: String
-  MasterUsername:
-    Description: ""
-    Type: String
-  MasterPassword:
-    Description: ""
-    Type: String
 
 Outputs:
   ProjectName:
@@ -28,37 +22,30 @@ Outputs:
   InstanceName:
     Value: !Ref InstanceName
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-Database-InstanceName
-  ReadEndpoint:
+      Name: !Sub ${ProjectName}-${EnvironName}-ElastiCache-InstanceName
+  Endpoint:
     Value: !Sub
-      - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
+      - ${EnvironName}-${InstanceName}.elasticache.${ProjectName}.${DomainName}
       - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-ReadEndpoint
-  WriteEndpoint:
-    Value: !Sub
-      - ${EnvironName}-${InstanceName}.write.${ProjectName}.${DomainName}
-      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
-    Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-WriteEndpoint
+      Name: !Sub ${ProjectName}-${EnvironName}-ElastiCache-${InstanceName}-Endpoint
 
 Resources:
-  # binding?
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
       SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
       IpProtocol: "tcp"
-      FromPort: "3306"
-      ToPort: "3306"
+      FromPort: "6379"
+      ToPort: "6379"
 
   ParameterStoreEndpoint:
     Type: "AWS::SSM::Parameter"
     Properties:
       Description: InternalEndpoint
       Type: String
-      Name: !Sub "${ProjectName}_${EnvironName}_database_endpoint_read"
+      Name: !Sub "${ProjectName}_${EnvironName}_elasticache_endpoint"
       Value: !Sub
-        - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
+        - ${EnvironName}-${InstanceName}.elasticache.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}

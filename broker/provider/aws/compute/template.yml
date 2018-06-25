@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description:
+  AWS Compute
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  EnvironName:
+    Description: ""
+    Type: String
+  InstanceName:
+    Description: ""
+    Type: String
+
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: true
+        - Key: access_logs.s3.bucket
+          Value: !Sub
+            - ${EnvironName}-log.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+      SecurityGroups:
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-InternetFacingSecurityGroup" } }
+      Subnets:
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetPrimary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetSecondary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetTertiary" }
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-${EnvironName}-${InstanceName}"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-${EnvironName}-${InstanceName}"
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: "443"
+      Protocol: "HTTPS"
+      Certificates:
+        - CertificateArn: { "Fn::ImportValue": !Sub "${ProjectName}-Certificate" }
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Listener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref LoadBalancerTargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/"
+      Priority: 1
+
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0d74386b
+      InstanceType: t2.small
+      KeyName: !Ref ProjectName
+      IamInstanceProfile: { "Fn::ImportValue": !Sub "${ProjectName}-${EnvironName}-InstanceProfile" }
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: "gp2"
+            VolumeSize: 30
+      SecurityGroups:
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -x
+          apt-get -y update
+
+  AutoScaling:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    CreationPolicy:
+      ResourceSignal:
+        Count:   !Ref InstanceNum
+        Timeout: "PT20M"
+      AutoScalingCreationPolicy:
+        MinSuccessfulInstancesPercent: 80
+    Properties:
+      LaunchConfigurationName: !Ref LaunchConfig
+      DesiredCapacity: 1
+      MaxSize: 1
+      MinSize: 1
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      VPCZoneIdentifier:
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetPrimary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetSecondary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetTertiary" }
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 600
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  DNSRecourd:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
