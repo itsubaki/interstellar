@@ -3,7 +3,6 @@ package launcher
 type Launcher interface {
 	Config() *Config
 	Register(in *RegisterInput) *RegisterOutput
-	List(in *ListInput) *ListOutput
 }
 
 type Config struct {
@@ -11,18 +10,12 @@ type Config struct {
 }
 
 type RegisterInput struct {
-	CatalogURL string
+	CatalogURL string `json:"catalog_url"`
 }
 
 type RegisterOutput struct {
-	Status    int
-	Message   string
-	ServiceID string
-	Input     *RegisterInput
-}
-
-type ListInput struct {
-}
-
-type ListOutput struct {
+	Status    int            `json:"status"`
+	Message   string         `json:"message"`
+	ServiceID string         `json:"service_id"`
+	Input     *RegisterInput `json:"input"`
 }

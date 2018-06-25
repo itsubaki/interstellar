@@ -25,7 +25,8 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 		Require:  []string{},
 		Bindable: false,
 		ParameterSpec: []*broker.ParamSpec{
-			{Name: "integration_role_arn", Required: true},
+			{Name: "aws_account_id", Required: true},
+			{Name: "integration_role_arn", Required: false},
 			{Name: "project_name", Required: true},
 			{Name: "cidr", Required: true},
 			{Name: "domain", Required: true},

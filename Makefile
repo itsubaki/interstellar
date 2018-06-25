@@ -5,6 +5,7 @@ BUILD := ${PWD}/_build
 build:
 	set -x
 
+	cd launcher/interstellar;        docker build -t interstellar:${HASH} .
 	cd broker/provider/aws/project;  docker build -t broker.aws.project:${HASH} .
 	cd broker/provider/aws/environ;  docker build -t broker.aws.environ:${HASH} .
 	cd broker/provider/aws/database; docker build -t broker.aws.database:${HASH} .
@@ -15,11 +16,12 @@ build:
 up:
 	set -x
 
-	docker run -d --rm -p 9080:8080 --name project  broker.aws.project:${HASH}
-	docker run -d --rm -p 9081:8080 --name environ  broker.aws.environ:${HASH}
-	docker run -d --rm -p 9082:8080 --name database broker.aws.database:${HASH}
-	docker run -d --rm -p 9083:8080 --name cache    broker.aws.cache:${HASH}
-	docker run -d --rm -p 9084:8080 --name compute  broker.aws.compute:${HASH}
+	docker run -d --rm -p 9080:8080 --name interstellar  interstellar:${HASH}
+	docker run -d --rm -p 9081:8080 --name project       broker.aws.project:${HASH}
+	docker run -d --rm -p 9082:8080 --name environ       broker.aws.environ:${HASH}
+	docker run -d --rm -p 9083:8080 --name database      broker.aws.database:${HASH}
+	docker run -d --rm -p 9084:8080 --name cache         broker.aws.cache:${HASH}
+	docker run -d --rm -p 9085:8080 --name compute       broker.aws.compute:${HASH}
 	docker ps
 
 down:
@@ -31,11 +33,11 @@ down:
 catalog:
 	set -x
 
-	curl -s localhost:9080/v1/catalog | jq .
 	curl -s localhost:9081/v1/catalog | jq .
 	curl -s localhost:9082/v1/catalog | jq .
 	curl -s localhost:9083/v1/catalog | jq .
 	curl -s localhost:9084/v1/catalog | jq .
+	curl -s localhost:9085/v1/catalog | jq .
 
 
 clean:
