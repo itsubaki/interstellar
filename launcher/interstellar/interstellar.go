@@ -26,7 +26,7 @@ func (i *Interstellar) Config() *launcher.Config {
 }
 
 func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOutput {
-	out, err := http.Get(in.CatalogURL)
+	out, err := http.Get(fmt.Sprintf("%s/v1/catalog", in.URL))
 	if err != nil {
 		return &launcher.RegisterOutput{
 			Status:  http.StatusBadRequest,

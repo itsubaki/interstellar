@@ -10,7 +10,7 @@ type Config struct {
 }
 
 type RegisterInput struct {
-	CatalogURL string `json:"catalog_url"`
+	URL string `json:"url"`
 }
 
 type RegisterOutput struct {
