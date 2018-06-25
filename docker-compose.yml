@@ -4,26 +4,26 @@
       - "9080:8080"
 
   broker.aws.project:
-    image:   broker.aws.project
+    image: broker.aws.project
     ports:
       - "9081:8080"
 
   broker.aws.environ:
-    image:   broker.aws.environ
+    image: broker.aws.environ
     ports:
       - "9082:8080"
 
   broker.aws.database:
-    image:   broker.aws.database
+    image: broker.aws.database
     ports:
       - "9083:8080"
 
   broker.aws.cache:
-    image:   broker.aws.cache
+    image: broker.aws.cache
     ports:
       - "9084:8080"
 
   broker.aws.compute:
-    image:   broker.aws.compute
+    image: broker.aws.compute
     ports:
       - "9085:8080"
