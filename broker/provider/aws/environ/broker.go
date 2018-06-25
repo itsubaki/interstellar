@@ -24,7 +24,7 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{"aws_project"},
 		Bindable: true,
-		ParameterSpec: []*broker.ParamSpec{
+		ParameterSpec: []broker.ParamSpec{
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 		},
@@ -36,7 +36,6 @@ func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
-		Input:   in,
 		Output:  out,
 	}
 }
@@ -45,7 +44,6 @@ func (b *EnvironBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
 	return &broker.DeleteOutput{
 		Status:  202,
 		Message: "Accepted",
-		Input:   in,
 	}
 }
 

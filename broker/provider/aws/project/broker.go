@@ -11,7 +11,7 @@ func NewProjectBroker() *ProjectBroker {
 
 func (b *ProjectBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: ":8080",
+		Port: ":8081",
 	}
 }
 
@@ -24,7 +24,7 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{},
 		Bindable: false,
-		ParameterSpec: []*broker.ParamSpec{
+		ParameterSpec: []broker.ParamSpec{
 			{Name: "aws_account_id", Required: true},
 			{Name: "integration_role_arn", Required: false},
 			{Name: "project_name", Required: true},
@@ -41,7 +41,6 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
-		Input:   in,
 		Output:  out,
 	}
 }
@@ -50,7 +49,6 @@ func (b *ProjectBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
 	return &broker.DeleteOutput{
 		Status:  202,
 		Message: "Accepted",
-		Input:   in,
 	}
 }
 

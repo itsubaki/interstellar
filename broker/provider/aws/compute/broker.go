@@ -1,6 +1,8 @@
 package main
 
-import "github.com/itsubaki/interstellar/broker"
+import (
+	"github.com/itsubaki/interstellar/broker"
+)
 
 type ComputeBroker struct {
 }
@@ -24,7 +26,7 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: false,
-		ParameterSpec: []*broker.ParamSpec{
+		ParameterSpec: []broker.ParamSpec{
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 			{Name: "instance_name", Required: true},
@@ -44,7 +46,6 @@ func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	return &broker.CreateOutput{
 		Status:  202,
 		Message: "Accepted",
-		Input:   in,
 		Output:  out,
 	}
 }

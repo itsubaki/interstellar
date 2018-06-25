@@ -14,8 +14,7 @@ type RegisterInput struct {
 }
 
 type RegisterOutput struct {
-	Status    int            `json:"status"`
-	Message   string         `json:"message"`
-	ServiceID string         `json:"service_id"`
-	Input     *RegisterInput `json:"input"`
+	Status    int    `json:"status"`
+	Message   string `json:"message"`
+	ServiceID string `json:"service_id"`
 }

@@ -36,13 +36,13 @@ type Config struct {
 }
 
 type Catalog struct {
-	Name          string       `json:"name"`
-	DisplayName   string       `json:"display_name"`
-	Description   string       `json:"description"`
-	Tag           []string     `json:"tag"`
-	Require       []string     `json:"require"`
-	Bindable      bool         `json:"bindable"`
-	ParameterSpec []*ParamSpec `json:"parameter"`
+	Name          string      `json:"name"`
+	DisplayName   string      `json:"display_name"`
+	Description   string      `json:"description"`
+	Tag           []string    `json:"tag"`
+	Require       []string    `json:"require"`
+	Bindable      bool        `json:"bindable"`
+	ParameterSpec []ParamSpec `json:"parameter"`
 }
 
 type ParamSpec struct {
@@ -61,7 +61,6 @@ type CreateInput struct {
 type CreateOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Input   *CreateInput      `json:"input"`
 	Output  map[string]string `json:"output"`
 }
 
@@ -70,9 +69,8 @@ type DeleteInput struct {
 }
 
 type DeleteOutput struct {
-	Status  int          `json:"status"`
-	Message string       `json:"message"`
-	Input   *DeleteInput `json:"input"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 type UpdateInput struct {
@@ -83,7 +81,6 @@ type UpdateInput struct {
 type UpdateOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Input   *UpdateInput      `json:"input"`
 	Output  map[string]string `json:"output"`
 }
 
@@ -95,7 +92,6 @@ type BindingInput struct {
 type BindingOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Input   *UpdateInput      `json:"input"`
 	Output  map[string]string `json:"output"`
 }
 

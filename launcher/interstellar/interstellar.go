@@ -29,8 +29,7 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 	if err != nil {
 		return &launcher.RegisterOutput{
 			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("get %s: %v", in.CatalogURL, err),
-			Input:   in,
+			Message: fmt.Sprintf("%v", err),
 		}
 	}
 
@@ -39,7 +38,6 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 		return &launcher.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("read request body: %v", err),
-			Input:   in,
 		}
 	}
 	defer out.Body.Close()
@@ -49,23 +47,20 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 		return &launcher.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
-			Input:   in,
 		}
 	}
-	fmt.Println(res)
 
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return &launcher.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("new uuid: %v", err),
-			Input:   in,
 		}
 	}
 
 	return &launcher.RegisterOutput{
 		Status:    http.StatusOK,
 		ServiceID: uuid.String(),
-		Input:     in,
+		Message:   fmt.Sprintf("%v", res),
 	}
 }
