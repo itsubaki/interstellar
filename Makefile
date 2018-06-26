@@ -3,7 +3,7 @@ BUILD := ${PWD}/_build
 build:
 	set -x
 
-	cd controller/interstellar;      docker build -t interstellar        .
+	cd controller/main;              docker build -t controller          .
 	cd broker/provider/aws/project;  docker build -t broker.aws.project  .
 	cd broker/provider/aws/environ;  docker build -t broker.aws.environ  .
 	cd broker/provider/aws/database; docker build -t broker.aws.database .
@@ -15,12 +15,13 @@ build:
 up:
 	set -x
 
-	docker run -d --rm -p 9080:8080 --name interstellar  interstellar
-	docker run -d --rm -p 9081:8080 --name project       broker.aws.project
-	docker run -d --rm -p 9082:8080 --name environ       broker.aws.environ
-	docker run -d --rm -p 9083:8080 --name database      broker.aws.database
-	docker run -d --rm -p 9084:8080 --name cache         broker.aws.cache
-	docker run -d --rm -p 9085:8080 --name compute       broker.aws.compute
+	docker run -d --rm -p 9080:8080 --name controller controller
+	docker run -d --rm -p 9081:8080 --name project    broker.aws.project
+	docker run -d --rm -p 9082:8080 --name environ    broker.aws.environ
+	docker run -d --rm -p 9083:8080 --name database   broker.aws.database
+	docker run -d --rm -p 9084:8080 --name cache      broker.aws.cache
+	docker run -d --rm -p 9085:8080 --name compute    broker.aws.compute
+	
 	docker ps
 
 down:
@@ -51,10 +52,10 @@ package:
 	set -x
 	-rm -rf ${BUILD}
 
-	mkdir -p ${BUILD}/controller/interstellar/bin
+	mkdir -p ${BUILD}/controller/bin
 	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
 
-	cd controller/interstellar;      go build -o ${BUILD}/controller/interstellar/bin/interstellar
+	cd controller/main;              go build -o ${BUILD}/controller/bin/controller
 	cd broker/provider/aws/project;  go build -o ${BUILD}/broker/project/bin/project
 	cd broker/provider/aws/environ;  go build -o ${BUILD}/broker/environ/bin/environ
 	cd broker/provider/aws/database; go build -o ${BUILD}/broker/database/bin/database

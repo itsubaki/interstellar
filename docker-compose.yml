@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  interstellar:
-    image: interstellar
+  controller:
+    image: controller
     ports:
       - "9080:8080"
     environment:

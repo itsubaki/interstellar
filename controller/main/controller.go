@@ -12,20 +12,20 @@ import (
 	"github.com/itsubaki/interstellar/util"
 )
 
-type Interstellar struct {
+type Controller struct {
 }
 
-func NewInterstellar() *Interstellar {
-	return &Interstellar{}
+func NewController() *Controller {
+	return &Controller{}
 }
 
-func (i *Interstellar) Config() *controller.Config {
+func (i *Controller) Config() *controller.Config {
 	return &controller.Config{
 		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 
-func (i *Interstellar) Register(in *controller.RegisterInput) *controller.RegisterOutput {
+func (i *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {
 	out, err := http.Get(fmt.Sprintf("%s/v1/catalog", in.URL))
 	if err != nil {
 		return &controller.RegisterOutput{

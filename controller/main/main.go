@@ -3,5 +3,5 @@ package main
 import "github.com/itsubaki/interstellar/controller"
 
 func main() {
-	controller.Run(NewInterstellar())
+	controller.Run(NewController())
 }
