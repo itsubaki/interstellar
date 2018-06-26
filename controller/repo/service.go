@@ -3,14 +3,14 @@ package repo
 import "github.com/itsubaki/interstellar/controller"
 
 type ServiceRepository struct {
-	Reposotory []controller.Service
+	Reposotory []*controller.Service
 }
 
 func (r *ServiceRepository) Insert(s *controller.Service) {
-	r.Reposotory = append(r.Reposotory, *s)
+	r.Reposotory = append(r.Reposotory, s)
 }
 
-func (r *ServiceRepository) SelectAll() []controller.Service {
+func (r *ServiceRepository) SelectAll() []*controller.Service {
 	return r.Reposotory
 }
 
@@ -20,7 +20,7 @@ func (r *ServiceRepository) FindByName(name string) (*controller.Service, bool) 
 		if r.Reposotory[i].Name != name {
 			continue
 		}
-		return &r.Reposotory[i], true
+		return r.Reposotory[i], true
 	}
 
 	return nil, false
@@ -32,7 +32,7 @@ func (r ServiceRepository) FindByInstanceID(id string) (*controller.Service, boo
 		if r.Reposotory[i].ServiceID != id {
 			continue
 		}
-		return &r.Reposotory[i], true
+		return r.Reposotory[i], true
 	}
 
 	return nil, false

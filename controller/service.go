@@ -36,8 +36,7 @@ func Run(s ServiceController) {
 	})
 
 	g.GET("/v1/service/:service_id", func(c *gin.Context) {
-		id := c.Param("instance_id")
-		catalog := s.Catalog(id)
+		catalog := s.Catalog(c.Param("service_id"))
 		c.JSON(catalog.Status, catalog)
 	})
 

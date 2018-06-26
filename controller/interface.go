@@ -24,8 +24,8 @@ type RegisterOutput struct {
 }
 
 type ServiceOutput struct {
-	Status  int       `json:"status"`
-	Service []Service `json:"service"`
+	Status  int        `json:"status"`
+	Service []*Service `json:"service"`
 }
 
 type Service struct {
@@ -35,8 +35,8 @@ type Service struct {
 }
 
 type CatalogOutput struct {
-	Status    int            `json:"status"`
-	Message   string         `json:"message,omitempty"`
-	ServiceID string         `json:"service_id,omitempty"`
-	Catalog   broker.Catalog `json:"catalog,omitempty"`
+	Status    int             `json:"status"`
+	Message   string          `json:"message,omitempty"`
+	ServiceID string          `json:"service_id,omitempty"`
+	Catalog   *broker.Catalog `json:"catalog,omitempty"`
 }

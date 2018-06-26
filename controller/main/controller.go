@@ -41,6 +41,7 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 		return &controller.CatalogOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("service=%s not found", id),
+			Catalog: nil,
 		}
 	}
 
@@ -50,13 +51,14 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 			Status:    http.StatusBadRequest,
 			ServiceID: s.ServiceID,
 			Message:   fmt.Sprintf("catalog=%s not found", id),
+			Catalog:   nil,
 		}
 	}
 
 	return &controller.CatalogOutput{
 		Status:    http.StatusOK,
 		ServiceID: s.ServiceID,
-		Catalog:   *catalog,
+		Catalog:   catalog,
 	}
 
 }
