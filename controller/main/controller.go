@@ -13,19 +13,26 @@ import (
 )
 
 type Controller struct {
+	ServiceStore []controller.Service
 }
 
 func NewController() *Controller {
 	return &Controller{}
 }
 
-func (i *Controller) Config() *controller.Config {
+func (c *Controller) Config() *controller.Config {
 	return &controller.Config{
 		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 
-func (i *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {
+func (c *Controller) Service() *controller.ServiceOutput {
+	return &controller.ServiceOutput{
+		Service: c.ServiceStore,
+	}
+}
+
+func (c *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {
 	out, err := http.Get(fmt.Sprintf("%s/v1/catalog", in.URL))
 	if err != nil {
 		return &controller.RegisterOutput{
@@ -58,6 +65,12 @@ func (i *Controller) Register(in *controller.RegisterInput) *controller.Register
 			Message: fmt.Sprintf("new uuid: %v", err),
 		}
 	}
+
+	c.ServiceStore = append(c.ServiceStore, controller.Service{
+		Name:             res.Name,
+		ServiceID:        uuid.String(),
+		ServiceBrokerURL: in.URL,
+	})
 
 	return &controller.RegisterOutput{
 		Status:    http.StatusOK,

@@ -15,19 +15,13 @@ build:
 up:
 	set -x
 
-	docker run -d --rm -p 9080:8080 --name controller controller
-	docker run -d --rm -p 9081:8080 --name project    broker.aws.project
-	docker run -d --rm -p 9082:8080 --name environ    broker.aws.environ
-	docker run -d --rm -p 9083:8080 --name database   broker.aws.database
-	docker run -d --rm -p 9084:8080 --name cache      broker.aws.cache
-	docker run -d --rm -p 9085:8080 --name compute    broker.aws.compute
-	
+	docker-compose up -d
 	docker ps
 
 down:
 	set -x
 
-	docker stop $(shell docker ps -a -q)
+	docker-compose down
 	docker ps
 
 catalog:
@@ -67,5 +61,11 @@ package:
 	cp broker/provider/aws/database/template.yml ${BUILD}/broker/database/conf
 	cp broker/provider/aws/cache/template.yml    ${BUILD}/broker/cache/conf
 	cp broker/provider/aws/compute/template.yml  ${BUILD}/broker/compute/conf
+
+prune:
+	set -x
+
+	docker image prune --force
+	docker images
 
 .PHONY:
