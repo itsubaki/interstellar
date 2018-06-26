@@ -26,7 +26,7 @@ func (r *ServiceRepository) FindByName(name string) (*controller.Service, bool) 
 	return nil, false
 }
 
-func (r ServiceRepository) FindByInstanceID(id string) (*controller.Service, bool) {
+func (r *ServiceRepository) FindByInstanceID(id string) (*controller.Service, bool) {
 	// TODO O(N)
 	for i := range r.Reposotory {
 		if r.Reposotory[i].ServiceID != id {
