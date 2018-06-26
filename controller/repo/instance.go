@@ -1,8 +1,6 @@
 package repo
 
-import (
-	"github.com/itsubaki/interstellar/controller"
-)
+import "github.com/itsubaki/interstellar/controller"
 
 type InstanceRepository struct {
 	Repository []*controller.Instance

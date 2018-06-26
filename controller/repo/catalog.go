@@ -1,8 +1,6 @@
 package repo
 
-import (
-	"github.com/itsubaki/interstellar/broker"
-)
+import "github.com/itsubaki/interstellar/broker"
 
 type CatalogRepository struct {
 	Repository []*broker.Catalog
