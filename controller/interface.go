@@ -16,5 +16,5 @@ type RegisterInput struct {
 type RegisterOutput struct {
 	Status    int    `json:"status"`
 	Message   string `json:"message"`
-	ServiceID string `json:"service_id"`
+	ServiceID string `json:"service_id,omitempty"`
 }
