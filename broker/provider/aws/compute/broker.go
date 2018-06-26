@@ -27,12 +27,10 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 		},
 		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: false,
-		ParameterSpec: []broker.ParamSpec{
+		ParameterSpec: []*broker.ParamSpec{
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 			{Name: "instance_name", Required: true},
-			{Name: "image_id", Required: true},
-			{Name: "package", Required: true},
 		},
 	}
 }

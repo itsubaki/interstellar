@@ -36,13 +36,13 @@ type Config struct {
 }
 
 type Catalog struct {
-	Name          string      `json:"name"`
-	DisplayName   string      `json:"display_name"`
-	Description   string      `json:"description"`
-	Tag           []string    `json:"tag"`
-	Require       []string    `json:"require"`
-	Bindable      bool        `json:"bindable"`
-	ParameterSpec []ParamSpec `json:"parameter"`
+	Name          string       `json:"name"`
+	DisplayName   string       `json:"display_name"`
+	Description   string       `json:"description"`
+	Tag           []string     `json:"tag"`
+	Require       []string     `json:"require"`
+	Bindable      bool         `json:"bindable"`
+	ParameterSpec []*ParamSpec `json:"parameter"`
 }
 
 type ParamSpec struct {
