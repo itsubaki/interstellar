@@ -52,5 +52,10 @@ package:
 	cd broker/provider/aws/cache;    go build -o ${BUILD}/broker/cache/bin/cache
 	cd broker/provider/aws/compute;  go build -o ${BUILD}/broker/compute/bin/compute
 
+	cp broker/provider/aws/project/template.yml  ${BUILD}/broker/project/conf
+	cp broker/provider/aws/environ/template.yml  ${BUILD}/broker/environ/conf
+	cp broker/provider/aws/database/template.yml ${BUILD}/broker/database/conf
+	cp broker/provider/aws/cache/template.yml    ${BUILD}/broker/cache/conf
+	cp broker/provider/aws/compute/template.yml  ${BUILD}/broker/compute/conf
 
 .PHONY:

@@ -2,6 +2,8 @@
     image: interstellar
     ports:
       - "9080:8080"
+    environment:
+      - GIN_MODE=release
 
   broker.aws.project:
     image: broker.aws.project
