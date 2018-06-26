@@ -21,6 +21,7 @@ type RegisterOutput struct {
 }
 
 type ServiceOutput struct {
+	Status  int       `json:"status"`
 	Service []Service `json:"service"`
 }
 

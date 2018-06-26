@@ -30,6 +30,11 @@ func Run(s ServiceController) {
 		c.JSON(out.Status, out)
 	})
 
+	g.GET("/v1/service", func(c *gin.Context) {
+		out := s.Service()
+		c.JSON(out.Status, out)
+	})
+
 	log.Printf("%v\n", s.Config())
 	if err := g.Run(s.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)

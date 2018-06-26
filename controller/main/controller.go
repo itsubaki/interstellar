@@ -28,6 +28,7 @@ func (c *Controller) Config() *controller.Config {
 
 func (c *Controller) Service() *controller.ServiceOutput {
 	return &controller.ServiceOutput{
+		Status:  http.StatusOK,
 		Service: c.ServiceStore,
 	}
 }
