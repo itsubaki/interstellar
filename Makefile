@@ -33,7 +33,7 @@ catalog:
 	curl -s localhost:9084/v1/catalog | jq .
 	curl -s localhost:9085/v1/catalog | jq .
 
-test:
+register:
 	set -x
 
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.project_1:8080"}'  | jq .
@@ -42,8 +42,21 @@ test:
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.cache_1:8080"}'    | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.compute_1:8080"}'  | jq .
 
+service:
+	set -x
+
 	curl -s localhost:9080/v1/service | jq .
 	curl -s localhost:9080/v1/service/$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id') | jq .
+
+instance:
+	set -x
+
+	curl -s localhost:9080/v1/instance| jq .
+
+create:
+	set -x
+
+	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01"}' | jq .
 
 package:
 	set -x

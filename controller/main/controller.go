@@ -42,7 +42,6 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 		return &controller.CatalogOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("service=%s not found", id),
-			Catalog: nil,
 		}
 	}
 
@@ -52,7 +51,6 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 			Status:    http.StatusBadRequest,
 			ServiceID: s.ServiceID,
 			Message:   fmt.Sprintf("catalog=%s not found", id),
-			Catalog:   nil,
 		}
 	}
 
@@ -87,9 +85,9 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 			Message: fmt.Sprintf("new uuid: %v", err),
 		}
 	}
-	id := uuid.String()
+	instanceID := uuid.String()
 
-	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, id), "application/json", nil)
+	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, instanceID), "application/json", nil)
 	if err != nil {
 		return &controller.CreateInstanceOutput{
 			Status:  http.StatusBadRequest,
@@ -116,8 +114,9 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	i := &controller.Instance{
 		Name:       in.Name,
+		InstanceID: instanceID,
 		ServiceID:  s.ServiceID,
-		InstanceID: id,
+		Parameter:  in.Parameter,
 		Output:     res.Output,
 	}
 

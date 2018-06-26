@@ -27,6 +27,7 @@ type Instance struct {
 	Name       string            `json:"name"`
 	ServiceID  string            `json:"service_id"`
 	InstanceID string            `json:"instance_id"`
+	Parameter  map[string]string `json:"parameter"`
 	Output     map[string]string `json:"output"`
 }
 
