@@ -3,7 +3,7 @@ BUILD := ${PWD}/_build
 build:
 	set -x
 
-	cd launcher/interstellar;        docker build -t interstellar        .
+	cd controller/interstellar;      docker build -t interstellar        .
 	cd broker/provider/aws/project;  docker build -t broker.aws.project  .
 	cd broker/provider/aws/environ;  docker build -t broker.aws.environ  .
 	cd broker/provider/aws/database; docker build -t broker.aws.database .
@@ -42,10 +42,10 @@ package:
 	set -x
 	-rm -rf ${BUILD}
 
-	mkdir -p ${BUILD}/interstellar/bin
+	mkdir -p ${BUILD}/controller/interstellar/bin
 	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
 
-	cd launcher/interstellar;        go build -o ${BUILD}/interstellar/bin/interstellar
+	cd controller/interstellar;      go build -o ${BUILD}/controller/interstellar/bin/interstellar
 	cd broker/provider/aws/project;  go build -o ${BUILD}/broker/project/bin/project
 	cd broker/provider/aws/environ;  go build -o ${BUILD}/broker/environ/bin/environ
 	cd broker/provider/aws/database; go build -o ${BUILD}/broker/database/bin/database

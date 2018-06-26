@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsubaki/interstellar/broker"
-	"github.com/itsubaki/interstellar/launcher"
+	"github.com/itsubaki/interstellar/controller"
 	"github.com/itsubaki/interstellar/util"
 )
 
@@ -19,16 +19,16 @@ func NewInterstellar() *Interstellar {
 	return &Interstellar{}
 }
 
-func (i *Interstellar) Config() *launcher.Config {
-	return &launcher.Config{
+func (i *Interstellar) Config() *controller.Config {
+	return &controller.Config{
 		Port: util.Getenv("PORT", ":8080"),
 	}
 }
 
-func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOutput {
+func (i *Interstellar) Register(in *controller.RegisterInput) *controller.RegisterOutput {
 	out, err := http.Get(fmt.Sprintf("%s/v1/catalog", in.URL))
 	if err != nil {
-		return &launcher.RegisterOutput{
+		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("%v", err),
 		}
@@ -36,7 +36,7 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 
 	b, err := ioutil.ReadAll(out.Body)
 	if err != nil {
-		return &launcher.RegisterOutput{
+		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("read request body: %v", err),
 		}
@@ -45,7 +45,7 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 
 	var res broker.Catalog
 	if uerr := json.Unmarshal(b, &res); uerr != nil {
-		return &launcher.RegisterOutput{
+		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
 		}
@@ -53,13 +53,13 @@ func (i *Interstellar) Register(in *launcher.RegisterInput) *launcher.RegisterOu
 
 	uuid, err := uuid.NewUUID()
 	if err != nil {
-		return &launcher.RegisterOutput{
+		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("new uuid: %v", err),
 		}
 	}
 
-	return &launcher.RegisterOutput{
+	return &controller.RegisterOutput{
 		Status:    http.StatusOK,
 		ServiceID: uuid.String(),
 		Message:   fmt.Sprintf("%v", res),

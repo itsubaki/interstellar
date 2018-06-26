@@ -1,6 +1,6 @@
-package launcher
+package controller
 
-type Launcher interface {
+type ServiceController interface {
 	Config() *Config
 	Register(in *RegisterInput) *RegisterOutput
 }

@@ -1,4 +1,4 @@
-package launcher
+package controller
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Run(l Launcher) {
+func Run(s ServiceController) {
 	g := gin.New()
 
 	g.POST("/v1/register", func(c *gin.Context) {
@@ -26,12 +26,12 @@ func Run(l Launcher) {
 			return
 		}
 
-		out := l.Register(&req)
+		out := s.Register(&req)
 		c.JSON(out.Status, out)
 	})
 
-	log.Printf("%v\n", l.Config())
-	if err := g.Run(l.Config().Port); err != nil {
+	log.Printf("%v\n", s.Config())
+	if err := g.Run(s.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)
 	}
 }
