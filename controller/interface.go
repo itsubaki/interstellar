@@ -24,9 +24,10 @@ type Service struct {
 }
 
 type Instance struct {
-	Name       string `json:"name"`
-	ServiceID  string `json:"service_id"`
-	InstanceID string `json:"instance_id"`
+	Name       string            `json:"name"`
+	ServiceID  string            `json:"service_id"`
+	InstanceID string            `json:"instance_id"`
+	Output     map[string]string `json:"output"`
 }
 
 type RegisterInput struct {
@@ -54,10 +55,11 @@ type CatalogOutput struct {
 type InstanceOutput struct {
 	Status   int         `json:"status"`
 	Message  string      `json:"message,omitempty"`
-	Instance []*Instance `json:"instance,omitempty"`
+	Instance []*Instance `json:"instance"`
 }
 
 type CreateInstanceInput struct {
+	Name      string            `json:"name"`
 	ServiceID string            `json:"service_id"`
 	Parameter map[string]string `json:"parameter"`
 }

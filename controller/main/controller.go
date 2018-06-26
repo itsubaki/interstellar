@@ -115,9 +115,10 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 	}
 
 	i := &controller.Instance{
-		Name:       id,
+		Name:       in.Name,
 		ServiceID:  s.ServiceID,
 		InstanceID: id,
+		Output:     res.Output,
 	}
 
 	c.InstanceRepository.Insert(i)
