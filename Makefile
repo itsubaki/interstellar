@@ -38,6 +38,15 @@ catalog:
 	curl -s localhost:9084/v1/catalog | jq .
 	curl -s localhost:9085/v1/catalog | jq .
 
+register:
+	set -x
+
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.project_1:8080"}'  | jq .
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.environ_1:8080"}'  | jq .
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.database_1:8080"}' | jq .
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.cache_1:8080"}'    | jq .
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.compute_1:8080"}'  | jq .
+
 package:
 	set -x
 	-rm -rf ${BUILD}
