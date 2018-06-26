@@ -19,7 +19,20 @@ func (b *CacheBroker) Config() *broker.Config {
 }
 
 func (b *CacheBroker) Catalog() *broker.Catalog {
-	return &broker.Catalog{}
+	return &broker.Catalog{
+		Name: "aws_cache",
+		Tag: []string{
+			"aws",
+			"cache",
+		},
+		Require:  []string{"aws_project", "aws_environ"},
+		Bindable: false,
+		ParameterSpec: []broker.ParamSpec{
+			{Name: "project_name", Required: true},
+			{Name: "environ_name", Required: true},
+			{Name: "instance_name", Required: true},
+		},
+	}
 }
 
 func (b *CacheBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
