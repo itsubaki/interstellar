@@ -14,8 +14,9 @@ import (
 )
 
 type Controller struct {
-	ServiceRepository repo.ServiceRepository
-	CatalogRepository repo.CatalogRepository
+	ServiceRepository  repo.ServiceRepository
+	CatalogRepository  repo.CatalogRepository
+	InstanceRepository repo.InstanceRepository
 }
 
 func NewController() *Controller {
@@ -63,6 +64,71 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 
 }
 
+func (c *Controller) Instance() *controller.InstanceOutput {
+	return &controller.InstanceOutput{
+		Status:   http.StatusOK,
+		Instance: c.InstanceRepository.SelectAll(),
+	}
+}
+
+func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *controller.CreateInstanceOutput {
+	s, ok := c.ServiceRepository.FindByInstanceID(in.ServiceID)
+	if !ok {
+		return &controller.CreateInstanceOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("service=%s not found", in.ServiceID),
+		}
+	}
+
+	uuid, err := uuid.NewUUID()
+	if err != nil {
+		return &controller.CreateInstanceOutput{
+			Status:  http.StatusInternalServerError,
+			Message: fmt.Sprintf("new uuid: %v", err),
+		}
+	}
+	id := uuid.String()
+
+	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, id), "application/json", nil)
+	if err != nil {
+		return &controller.CreateInstanceOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("%v", err),
+		}
+	}
+
+	b, err := ioutil.ReadAll(out.Body)
+	if err != nil {
+		return &controller.CreateInstanceOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("read request body: %v", err),
+		}
+	}
+	defer out.Body.Close()
+
+	var res broker.CreateOutput
+	if uerr := json.Unmarshal(b, &res); uerr != nil {
+		return &controller.CreateInstanceOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
+		}
+	}
+
+	i := &controller.Instance{
+		Name:       id,
+		ServiceID:  s.ServiceID,
+		InstanceID: id,
+	}
+
+	c.InstanceRepository.Insert(i)
+
+	return &controller.CreateInstanceOutput{
+		Status:   http.StatusOK,
+		Instance: i,
+	}
+
+}
+
 func (c *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {
 	out, err := http.Get(fmt.Sprintf("%s/v1/catalog", in.URL))
 	if err != nil {
@@ -81,33 +147,33 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	}
 	defer out.Body.Close()
 
-	var catalog broker.Catalog
-	if uerr := json.Unmarshal(b, &catalog); uerr != nil {
+	var res broker.Catalog
+	if uerr := json.Unmarshal(b, &res); uerr != nil {
 		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
 		}
 	}
 
-	if s, ok := c.ServiceRepository.FindByName(catalog.Name); ok {
+	if s, ok := c.ServiceRepository.FindByName(res.Name); ok {
 		return &controller.RegisterOutput{
 			Status:    http.StatusConflict,
 			ServiceID: s.ServiceID,
-			Message:   fmt.Sprintf("%s already exists", catalog.Name),
+			Message:   fmt.Sprintf("%s already exists", res.Name),
 		}
 	}
 
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return &controller.RegisterOutput{
-			Status:  http.StatusBadRequest,
+			Status:  http.StatusInternalServerError,
 			Message: fmt.Sprintf("new uuid: %v", err),
 		}
 	}
 
-	c.CatalogRepository.Insert(&catalog)
+	c.CatalogRepository.Insert(&res)
 	c.ServiceRepository.Insert(&controller.Service{
-		Name:             catalog.Name,
+		Name:             res.Name,
 		ServiceID:        uuid.String(),
 		ServiceBrokerURL: in.URL,
 	})
@@ -115,6 +181,6 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	return &controller.RegisterOutput{
 		Status:    http.StatusOK,
 		ServiceID: uuid.String(),
-		Message:   fmt.Sprintf("%v", catalog),
+		Message:   fmt.Sprintf("%v", res),
 	}
 }

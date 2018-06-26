@@ -5,20 +5,20 @@ import (
 )
 
 type CatalogRepository struct {
-	Reposotory []*broker.Catalog
+	Repository []*broker.Catalog
 }
 
 func (r *CatalogRepository) Insert(catalog *broker.Catalog) {
-	r.Reposotory = append(r.Reposotory, catalog)
+	r.Repository = append(r.Repository, catalog)
 }
 
 func (r *CatalogRepository) FindByName(name string) (*broker.Catalog, bool) {
 	// TODO O(N)
-	for i := range r.Reposotory {
-		if r.Reposotory[i].Name != name {
+	for i := range r.Repository {
+		if r.Repository[i].Name != name {
 			continue
 		}
-		return r.Reposotory[i], true
+		return r.Repository[i], true
 	}
 
 	return nil, false

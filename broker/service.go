@@ -13,7 +13,7 @@ func Run(b ServiceBroker) {
 		c.JSON(200, b.Catalog())
 	})
 
-	g.PUT("/v1/service/:instance_id", func(c *gin.Context) {
+	g.POST("/v1/service/:instance_id", func(c *gin.Context) {
 		in := &CreateInput{
 			InstanceID: c.Param("instance_id"),
 		}
@@ -29,7 +29,7 @@ func Run(b ServiceBroker) {
 		c.JSON(out.Status, out)
 	})
 
-	log.Printf("%v\n", b.Config())
+	log.Printf("config=%v\n", b.Config())
 	if err := g.Run(b.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)
 	}

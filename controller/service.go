@@ -20,13 +20,13 @@ func Run(s ServiceController) {
 		}
 		defer c.Request.Body.Close()
 
-		var req RegisterInput
-		if err := json.Unmarshal(b, &req); err != nil {
+		var in RegisterInput
+		if err := json.Unmarshal(b, &in); err != nil {
 			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
 			return
 		}
 
-		out := s.Register(&req)
+		out := s.Register(&in)
 		c.JSON(out.Status, out)
 	})
 
@@ -40,7 +40,30 @@ func Run(s ServiceController) {
 		c.JSON(catalog.Status, catalog)
 	})
 
-	log.Printf("%v\n", s.Config())
+	g.GET("/v1/instance", func(c *gin.Context) {
+		out := s.Instance()
+		c.JSON(out.Status, out)
+	})
+
+	g.POST("/v1/instance", func(c *gin.Context) {
+		b, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(500, fmt.Errorf("read request body: %v", err))
+			return
+		}
+		defer c.Request.Body.Close()
+
+		var in CreateInstanceInput
+		if err := json.Unmarshal(b, &in); err != nil {
+			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
+			return
+		}
+
+		out := s.CreateInstance(&in)
+		c.JSON(out.Status, out)
+	})
+
+	log.Printf("config=%v\n", s.Config())
 	if err := g.Run(s.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)
 	}
