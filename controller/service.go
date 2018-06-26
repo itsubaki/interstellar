@@ -35,6 +35,12 @@ func Run(s ServiceController) {
 		c.JSON(out.Status, out)
 	})
 
+	g.GET("/v1/service/:service_id", func(c *gin.Context) {
+		id := c.Param("instance_id")
+		catalog := s.Catalog(id)
+		c.JSON(catalog.Status, catalog)
+	})
+
 	log.Printf("%v\n", s.Config())
 	if err := g.Run(s.Config().Port); err != nil {
 		log.Fatalf("run broker: %v", err)

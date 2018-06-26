@@ -9,11 +9,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsubaki/interstellar/broker"
 	"github.com/itsubaki/interstellar/controller"
+	"github.com/itsubaki/interstellar/controller/repo"
 	"github.com/itsubaki/interstellar/util"
 )
 
 type Controller struct {
-	ServiceStore []controller.Service
+	ServiceRepository repo.ServiceRepository
+	CatalogRepository repo.CatalogRepository
 }
 
 func NewController() *Controller {
@@ -29,8 +31,34 @@ func (c *Controller) Config() *controller.Config {
 func (c *Controller) Service() *controller.ServiceOutput {
 	return &controller.ServiceOutput{
 		Status:  http.StatusOK,
-		Service: c.ServiceStore,
+		Service: c.ServiceRepository.SelectAll(),
 	}
+}
+
+func (c *Controller) Catalog(id string) *controller.CatalogOutput {
+	s, ok := c.ServiceRepository.FindByInstanceID(id)
+	if !ok {
+		return &controller.CatalogOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("service=%s not found", id),
+		}
+	}
+
+	catalog, ok := c.CatalogRepository.FindByName(s.Name)
+	if !ok {
+		return &controller.CatalogOutput{
+			Status:    http.StatusBadRequest,
+			ServiceID: s.ServiceID,
+			Message:   fmt.Sprintf("catalog=%s not found", id),
+		}
+	}
+
+	return &controller.CatalogOutput{
+		Status:    http.StatusOK,
+		ServiceID: s.ServiceID,
+		Catalog:   *catalog,
+	}
+
 }
 
 func (c *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {
@@ -51,11 +79,19 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	}
 	defer out.Body.Close()
 
-	var res broker.Catalog
-	if uerr := json.Unmarshal(b, &res); uerr != nil {
+	var catalog broker.Catalog
+	if uerr := json.Unmarshal(b, &catalog); uerr != nil {
 		return &controller.RegisterOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
+		}
+	}
+
+	if s, ok := c.ServiceRepository.FindByName(catalog.Name); ok {
+		return &controller.RegisterOutput{
+			Status:    http.StatusConflict,
+			ServiceID: s.ServiceID,
+			Message:   fmt.Sprintf("%s already exists", catalog.Name),
 		}
 	}
 
@@ -67,8 +103,9 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 		}
 	}
 
-	c.ServiceStore = append(c.ServiceStore, controller.Service{
-		Name:             res.Name,
+	c.CatalogRepository.Insert(&catalog)
+	c.ServiceRepository.Insert(&controller.Service{
+		Name:             catalog.Name,
 		ServiceID:        uuid.String(),
 		ServiceBrokerURL: in.URL,
 	})
@@ -76,6 +113,6 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	return &controller.RegisterOutput{
 		Status:    http.StatusOK,
 		ServiceID: uuid.String(),
-		Message:   fmt.Sprintf("%v", res),
+		Message:   fmt.Sprintf("%v", catalog),
 	}
 }
