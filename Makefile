@@ -43,11 +43,7 @@ package:
 	-rm -rf ${BUILD}
 
 	mkdir -p ${BUILD}/interstellar/bin
-	mkdir -p ${BUILD}/broker/cache/bin
-	mkdir -p ${BUILD}/broker/compute/bin
-	mkdir -p ${BUILD}/broker/database/bin
-	mkdir -p ${BUILD}/broker/project/bin
-	mkdir -p ${BUILD}/broker/environ/bin
+	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
 
 	cd launcher/interstellar;        go build -o ${BUILD}/interstellar/bin/interstellar
 	cd broker/provider/aws/project;  go build -o ${BUILD}/broker/project/bin/project
