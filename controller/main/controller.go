@@ -181,6 +181,5 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	return &controller.RegisterOutput{
 		Status:    http.StatusOK,
 		ServiceID: uuid.String(),
-		Message:   fmt.Sprintf("%v", res),
 	}
 }

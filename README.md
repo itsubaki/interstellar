@@ -32,35 +32,30 @@ $ make register
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.project_1:8080"}'  | jq .
 {
   "status": 200,
-  "message": "{aws_project   [aws project] [] false [0xc4201b60f0 0xc4201b6140 0xc4201b6190 0xc4201b61e0 0xc4201b6230]}",
   "service_id": "c7aa976d-79a3-11e8-8e2f-0242ac120004"
 }
 
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.environ_1:8080"}'  | jq .
 {
   "status": 200,
-  "message": "{aws_environ   [aws environ] [aws_project] true [0xc420013a40 0xc420013a90]}",
   "service_id": "c7b22741-79a3-11e8-8e2f-0242ac120004"
 }
 
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.database_1:8080"}' | jq .
 {
   "status": 200,
-  "message": "{aws_database   [aws database] [aws_project aws_environ] true [0xc4201b63c0 0xc4201b6410 0xc4201b6460 0xc4201b64b0 0xc4201b6500]}",
   "service_id": "c7b5f849-79a3-11e8-8e2f-0242ac120004"
 }
 
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.cache_1:8080"}'    | jq .
 {
   "status": 200,
-  "message": "{aws_cache   [aws cache] [aws_project aws_environ] false [0xc420013ea0 0xc420013ef0 0xc420013f40]}",
   "service_id": "c7bb9e9f-79a3-11e8-8e2f-0242ac120004"
 }
 
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.compute_1:8080"}'  | jq .
 {
   "status": 200,
-  "message": "{aws_compute   [aws compute] [aws_project aws_environ] false [0xc4201b6730 0xc4201b6780 0xc4201b67d0]}",
   "service_id": "c7bf8401-79a3-11e8-8e2f-0242ac120004"
 }
 ```
