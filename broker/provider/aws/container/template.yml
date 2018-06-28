@@ -2,3 +2,162 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Description:
   AWS Container
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  EnvironName:
+    Description: ""
+    Type: String
+  InstanceName:
+    Description: ""
+    Type: String
+
+Outputs:
+  ContainerRepository:
+    Value: !Sub
+      - ${AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ProjectName}.${EnvironName}/${InstanceName}
+      - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+  AWSLogsGroup:
+    Value: !Ref Repository
+  TaskExecutionRole:
+    Value: !Ref TaskExecutionRole
+  ApplicationSecurityGroup:
+    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
+  PublicSubnetPrimary:
+    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-PublicSubnetPrimary" } }
+  PublicSubnetSecondary:
+    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-PublicSubnetSecondary" } }
+  PublicSubnetTertiary:
+    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-PublicSubnetTertiary" } }
+
+Resources:
+  DNSRecourd:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: true
+        - Key: access_logs.s3.bucket
+          Value: !Sub
+            - ${EnvironName}-log.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+      SecurityGroups:
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-InternetFacingSecurityGroup" } }
+      Subnets:
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetPrimary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetSecondary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetTertiary" }
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: { "Fn::ImportValue": !Sub "${ProjectName}-Certificate" }
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Listener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref LoadBalancerTargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /
+      Priority: 1
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironName}-task-executrion.${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+      Policies:
+        - PolicyName: !Sub ${EnvironName}-task-executrion.${ProjectName}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Resource: "*"
+                Action:
+                  - "ecr:GetAuthorizationToken"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:BatchGetImage"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${ProjectName}.${EnvironName}/${InstanceName}
+      RetentionInDays: 180
+
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${ProjectName}.${EnvironName}/${InstanceName}

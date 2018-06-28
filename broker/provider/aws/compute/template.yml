@@ -45,6 +45,21 @@ Parameters:
     Default: 1
 
 Resources:
+  DNSRecourd:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -169,17 +184,93 @@ Resources:
         - Key: InstanceName
           Value: !Ref InstanceName
 
-  DNSRecourd:
-    Type: AWS::Route53::RecordSet
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
     Properties:
-      Type: A
-      AliasTarget:
-        DNSName: !GetAtt LoadBalancer.DNSName
-        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-      Comment: ""
-      HostedZoneName: !Sub
-        - ${ProjectName}.${DomainName}.
-        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
-      Name: !Sub
-        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
-        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Roles:
+        - !Ref ReadOnlyIAMRole
+        - !Ref RunCommandIAMRole
+        - !Ref S3S3BucketIAMRole
+
+  ReadOnlyIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironName}-readonly.${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+
+  RunCommandIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironName}-runcommand.${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+
+  S3BucketIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironName}-s3bucket.${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      Policies:
+        PolicyName: !Sub ${EnvironName}-s3bucket.${ProjectName}
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: s3:*
+              Resource:
+                - !Sub
+                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}
+                  - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+                - !Sub
+                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}/*
+                  - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  LoadBalancerIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironName}-loadbalancer.${ProjectName}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              - ec2.amazonaws.com
+      Policies:
+        PolicyName: !Sub ${EnvironName}-loadbalancer.${ProjectName}
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:*
+                - autoscaling:*
+                - elasticloadbalancing:*
+                - cloudwatch:GetMetricStatistics
+              Resource: * #TODO isolate with EnvironName
