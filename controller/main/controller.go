@@ -9,14 +9,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsubaki/interstellar/broker"
 	"github.com/itsubaki/interstellar/controller"
-	"github.com/itsubaki/interstellar/controller/repo"
+	"github.com/itsubaki/interstellar/controller/repository"
 	"github.com/itsubaki/interstellar/util"
 )
 
 type Controller struct {
-	ServiceRepository  repo.ServiceRepository
-	CatalogRepository  repo.CatalogRepository
-	InstanceRepository repo.InstanceRepository
+	ServiceRepository  repository.ServiceRepository
+	CatalogRepository  repository.CatalogRepository
+	InstanceRepository repository.InstanceRepository
 }
 
 func NewController() *Controller {
