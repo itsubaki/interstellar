@@ -13,6 +13,62 @@ Parameters:
   InstanceName:
     Description: ""
     Type: String
+  CacheNodeType:
+    Description: ""
+    Type: String
+    Default: cache.t2.micro
+    AllowedValues:
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.m3.medium
+      - cache.m3.large
+      - cache.m3.xlarge
+      - cache.m3.2xlarge
+      - cache.m4.large
+      - cache.m4.xlarge
+      - cache.m4.2xlarge
+      - cache.m4.4xlarge
+      - cache.m4.10xlarge
+      - cache.r3.large
+      - cache.r3.xlarge
+      - cache.r3.2xlarge
+      - cache.r3.4xlarge
+      - cache.r3.8xlarge
+      - cache.r4.large
+  Timeout:
+    Description: "0, 20-"
+    Type: String
+    Default: 20
+  NumCacheClusters:
+    Description: ""
+    Type: String
+    Default: 1
+  AutomaticFailoverEnabled:
+    Description: ""
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  Engine:
+    Description: ""
+    Type: String
+    Default: redis
+    AllowedValues:
+      - redis
+  EngineVersion:
+    Description: ""
+    Type: String
+    Default: 2.8.24
+    AllowedValues:
+      - 2.8.24
+  Family:
+    Description: ""
+    Type: String
+    Default: redis2.8
+    AllowedValues:
+      - redis2.8
 
 Outputs:
   ProjectName:
@@ -31,14 +87,20 @@ Outputs:
       Name: !Sub ${ProjectName}-${EnvironName}-ElastiCache-${InstanceName}-Endpoint
 
 Resources:
-  SecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
+  Endpoint:
+    Type: AWS::Route53::RecordSet
     Properties:
-      GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
-      SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
-      IpProtocol: tcp
-      FromPort: 6379
-      ToPort: 6379
+      Type: CNAME
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}-elasticache.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      TTL: "900"
+      ResourceRecords:
+        - !GetAtt ReplicationGroup.PrimaryEndPoint.Address
 
   ParameterStoreEndpoint:
     Type: AWS::SSM::Parameter
@@ -47,5 +109,46 @@ Resources:
       Type: String
       Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_elasticache_endpoint
       Value: !Sub
-        - ${EnvironName}-${InstanceName}.elasticache.${ProjectName}.${DomainName}
+        - ${EnvironName}-${InstanceName}-elasticache.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  SubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: ""
+      SubnetIds:
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetPrimary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetSecondary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetTertiary"}
+
+  ParameterGroup:
+    Type: AWS::ElastiCache::ParameterGroup
+    Properties:
+      Description: ""
+      CacheParameterGroupFamily: !Ref Family
+      Properties:
+        timeout: !Ref Timeout
+
+
+  ReplicationGroup:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupDescription: ""
+      AutomaticFailoverEnabled: !Ref AutomaticFailoverEnabled
+      CacheNodeType:            !Ref CacheNodeType
+      CacheParameterGroupName:  !Ref ParameterGroup
+      CacheSubnetGroupName:     !Ref SubnetGroup
+      Engine:                   !Ref Engine
+      EngineVersion:            !Ref EngineVersion
+      NumCacheClusters:         !Ref NumCacheClusters
+      SecurityGroupIds:
+        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup"}
+
+  SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
+      SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
+      IpProtocol: tcp
+      FromPort: 6379
+      ToPort: 6379
