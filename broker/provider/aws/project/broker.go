@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/itsubaki/interstellar/broker"
 	"github.com/itsubaki/interstellar/util"
 )
@@ -38,35 +40,46 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 }
 
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	out := make(map[string]string)
-	out["nameserver"] = "ns-1,ns-2,ns-3,ns-4"
-
 	return &broker.CreateOutput{
-		Status:  202,
+		Status:  http.StatusAccepted,
 		Message: "Accepted",
-		Output:  out,
 	}
 }
 
 func (b *ProjectBroker) Delete(in *broker.DeleteInput) *broker.DeleteOutput {
 	return &broker.DeleteOutput{
-		Status:  202,
+		Status:  http.StatusAccepted,
 		Message: "Accepted",
 	}
 }
 
 func (b *ProjectBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
-	return &broker.UpdateOutput{}
+	return &broker.UpdateOutput{
+		Status:  http.StatusAccepted,
+		Message: "Accepted",
+	}
 }
 
 func (b *ProjectBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
-	return &broker.BindingOutput{}
+	return &broker.BindingOutput{
+		Status:  http.StatusAccepted,
+		Message: "Accepted",
+	}
 }
 
 func (b *ProjectBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOutput {
-	return &broker.UnbindingOutput{}
+	return &broker.UnbindingOutput{
+		Status:  http.StatusAccepted,
+		Message: "Accepted",
+	}
 }
 
 func (b *ProjectBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
-	return &broker.StatusOutput{}
+	out := make(map[string]string)
+	out["nameserver"] = "ns-1,ns-2,ns-3,ns-4"
+
+	return &broker.StatusOutput{
+		Status: http.StatusOK,
+		Output: out,
+	}
 }

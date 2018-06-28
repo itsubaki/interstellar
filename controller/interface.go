@@ -56,7 +56,7 @@ type CatalogOutput struct {
 type InstanceOutput struct {
 	Status   int         `json:"status"`
 	Message  string      `json:"message,omitempty"`
-	Instance []*Instance `json:"instance"`
+	Instance []*Instance `json:"instance,omitempty"`
 }
 
 type CreateInstanceInput struct {

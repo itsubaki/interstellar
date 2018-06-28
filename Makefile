@@ -3,7 +3,7 @@ BUILD := ${PWD}/_build
 build:
 	set -x
 
-	cd controller/main;              docker build -t controller          .
+	cd controller/controller;        docker build -t controller          .
 	cd broker/provider/aws/project;  docker build -t broker.aws.project  .
 	cd broker/provider/aws/environ;  docker build -t broker.aws.environ  .
 	cd broker/provider/aws/database; docker build -t broker.aws.database .
@@ -56,7 +56,7 @@ instance:
 create:
 	set -x
 
-	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01"}' | jq .
+	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01", "parameter": {"project_name": "myproject", "cidr": "10.1.0.0/16"}}' | jq .
 
 package:
 	set -x
@@ -65,7 +65,7 @@ package:
 	mkdir -p ${BUILD}/controller/bin
 	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
 
-	cd controller/main;              go build -o ${BUILD}/controller/bin/controller
+	cd controller/controller;        go build -o ${BUILD}/controller/bin/controller
 	cd broker/provider/aws/project;  go build -o ${BUILD}/broker/project/bin/project
 	cd broker/provider/aws/environ;  go build -o ${BUILD}/broker/environ/bin/environ
 	cd broker/provider/aws/database; go build -o ${BUILD}/broker/database/bin/database

@@ -61,7 +61,7 @@ type CreateInput struct {
 type CreateOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Output  map[string]string `json:"output"`
+	Output  map[string]string `json:"output,omitempty"`
 }
 
 type DeleteInput struct {
@@ -81,7 +81,7 @@ type UpdateInput struct {
 type UpdateOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Output  map[string]string `json:"output"`
+	Output  map[string]string `json:"output,omitempty"`
 }
 
 type BindingInput struct {
@@ -92,13 +92,16 @@ type BindingInput struct {
 type BindingOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
-	Output  map[string]string `json:"output"`
+	Output  map[string]string `json:"output,omitempty"`
 }
 
 type UnbindingInput struct {
 }
 
 type UnbindingOutput struct {
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Output  map[string]string `json:"output,omitempty"`
 }
 
 type StatusInput struct {
@@ -106,6 +109,7 @@ type StatusInput struct {
 }
 
 type StatusOutput struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Output  map[string]string `json:"output,omitempty"`
 }
