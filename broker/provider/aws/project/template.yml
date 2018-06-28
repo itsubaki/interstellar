@@ -78,6 +78,18 @@ Outputs:
     Value: !Ref PublicSubnetTertiary
     Export:
       Name: !Sub ${ProjectName}-PublicSubnetTertiary
+  PrivateSubnetPrimary:
+    Value: !Ref PublicSubnetPrimary
+    Export:
+      Name: !Sub ${ProjectName}-PrivateSubnetPrimary
+  PrivateSubnetSecondary:
+    Value: !Ref PublicSubnetSecondary
+    Export:
+      Name: !Sub ${ProjectName}-PrivateSubnetSecondary
+  PrivateSubnetTertiary:
+    Value: !Ref PublicSubnetTertiary
+    Export:
+      Name: !Sub ${ProjectName}-PrivateSubnetTertiary
   NameServer:
     Value: !Join
       - " "

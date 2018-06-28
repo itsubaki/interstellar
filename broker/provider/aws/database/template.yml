@@ -19,6 +19,25 @@ Parameters:
   MasterPassword:
     Description: ""
     Type: String
+  MultiAZ:
+    Description: ""
+    Type: String
+    Default: true
+    AllowedValues:
+      - true
+      - false
+  DBInstanceClass:
+    Description: ""
+    Type: String
+    Default: db.t2.small
+    AllowedValues:
+      - db.t2.small
+      - db.t2.medium
+      - db.r4.large
+      - db.r4.xlarge
+      - db.r4.2xlarge
+      - db.r4.4xlarge
+      - db.r4.8xlarge
 
 Outputs:
   ProjectName:
@@ -29,20 +48,190 @@ Outputs:
     Value: !Ref InstanceName
     Export:
       Name: !Sub ${ProjectName}-${EnvironName}-Database-InstanceName
-  ReadEndpoint:
-    Value: !Sub
-      - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
-      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
-    Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-ReadEndpoint
   WriteEndpoint:
-    Value: !Sub
-      - ${EnvironName}-${InstanceName}.write.${ProjectName}.${DomainName}
-      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
-    Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-Database-${InstanceName}-WriteEndpoint
+    Value: !Ref WriteEndpoint
+  ReadEndpoint:
+    Value: !Ref ReadEndpoint
 
 Resources:
+  WriteEndpoint:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: CNAME
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}-write.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      TTL: "900"
+      ResourceRecords:
+        - !GetAtt MySQLCluster.Endpoint.Address
+
+  ReadEndpoint:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: CNAME
+      Comment: ""
+      HostedZoneName: !Sub
+        - ${ProjectName}.${DomainName}.
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub
+        - ${EnvironName}-${InstanceName}-read.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      TTL: "900"
+      ResourceRecords:
+        - !GetAtt MySQLCluster.ReadEndpoint.Address
+
+  ParameterStoreWriteEndpoint:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: ""
+      Type: String
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_read_endpoint
+      Value: !Sub
+        - ${EnvironName}-${InstanceName}.write.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  ParameterStoreReadEndpoint:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: ""
+      Type: String
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_write_endpoint
+      Value: !Sub
+        - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+
+  ParameterStoreMasterUsername:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: ""
+      Type: String
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_masterusername
+      Value: !Ref MasterUsername
+
+  ParameterStoreMasterPassword:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: ""
+      Type: String
+      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_masterpassword
+      Value: !Ref MasterPassword
+
+  SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: ""
+      SubnetIds:
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetPrimary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetSecondary" }
+        - { "Fn::ImportValue": !Sub "${ProjectName}-PrivateSubnetTertiary"}
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  ClusterParameterGroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: ""
+      Family: aurora5.6
+      Parameters:
+        character_set_database: "utf8"
+
+  ParameterGroup:
+    Type: "AWS::RDS::DBParameterGroup"
+    Properties:
+      Description: ""
+      Family: aurora5.6
+      Parameters:
+        slow_query_log: 1
+        long_query_time: 1
+
+  Cluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora
+      BackupRetentionPeriod: 7
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterPassword
+      DBSubnetGroupName: !Ref SubnetGroup
+      DBClusterParameterGroupName: !Ref MySQLClusterParameterGroup
+      VpcSecurityGroupIds:
+        - { "Fn::ImportValue": !Sub "${BackendID}-Backend-SecurityGroup"}
+
+  Instance01:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: aurora
+      DBSubnetGroupName: !Ref SubnetGroup
+      DBClusterIdentifier: !Ref MySQLCluster
+      DBInstanceClass: !Ref DBInstanceClass
+      DBParameterGroupName: !Ref ParameterGroup
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  Instance02:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: aurora
+      DBSubnetGroupName: !Ref SubnetGroup
+      DBClusterIdentifier: !Ref MySQLCluster
+      DBInstanceClass: !Ref DBInstanceClass
+      DBParameterGroupName: !Ref ParameterGroup
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
+  Cluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora
+      BackupRetentionPeriod: 7
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterPassword
+      DBSubnetGroupName: !Ref SubnetGroup
+      DBClusterParameterGroupName: !Ref ClusterParameterGroup
+      VpcSecurityGroupIds:
+        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup"}
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
+
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -51,13 +240,3 @@ Resources:
       IpProtocol: tcp
       FromPort: 3306
       ToPort: 3306
-
-  ParameterStoreEndpoint:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Description: InternalEndpoint
-      Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_endpoint_read
-      Value: !Sub
-        - ${EnvironName}-${InstanceName}.read.${ProjectName}.${DomainName}
-        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
