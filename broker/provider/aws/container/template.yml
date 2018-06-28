@@ -19,8 +19,8 @@ Outputs:
     Value: !Sub
       - ${AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ProjectName}.${EnvironName}/${InstanceName}
       - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
-  AWSLogsGroup:
-    Value: !Ref Repository
+  LogGroup:
+    Value: !Ref LogGroup
   TaskExecutionRole:
     Value: !Ref TaskExecutionRole
   ApplicationSecurityGroup:
