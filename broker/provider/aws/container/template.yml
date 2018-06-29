@@ -17,8 +17,10 @@ Parameters:
 Outputs:
   ContainerRepository:
     Value: !Sub
-      - ${AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ProjectName}.${EnvironName}/${InstanceName}
+      - ${AccountId}.dkr.ecr.${Region}.amazonaws.com/${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
       - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+      - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
+      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
   LogGroup:
     Value: !Ref LogGroup
   TaskExecutionRole:
@@ -69,7 +71,9 @@ Resources:
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetTertiary" }
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -85,7 +89,9 @@ Resources:
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+          Value: !Sub
+            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
         - Key: EnvironName
@@ -123,32 +129,33 @@ Resources:
     Properties:
       RoleName: !Sub ${EnvironName}-task-executrion.${ProjectName}
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-          - Effect: "Allow"
+          - Effect: Allow
             Action:
-              - "sts:AssumeRole"
+              - sts:AssumeRole
             Principal:
               Service:
-                - "ecs-tasks.amazonaws.com"
+                - ecs-tasks.amazonaws.com
       Policies:
         - PolicyName: !Sub ${EnvironName}-task-executrion.${ProjectName}
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: 2012-10-17
             Statement:
-              - Effect: "Allow"
-                Resource: "*"
+              - Effect: Allow
+                Resource: *
                 Action:
-                  - "ecr:GetAuthorizationToken"
-                  - "ecr:BatchCheckLayerAvailability"
-                  - "ecr:GetDownloadUrlForLayer"
-                  - "ecr:BatchGetImage"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
 
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
+      # cluster name must start with a letter and can only contain letters, numbers, or hyphens
       ClusterName: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
 
   LogGroup:
@@ -160,4 +167,7 @@ Resources:
   Repository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub ${ProjectName}.${EnvironName}/${InstanceName}
+      RepositoryName: !Sub ${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
+        - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+        - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
+        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}

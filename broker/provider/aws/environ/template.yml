@@ -28,16 +28,12 @@ Outputs:
     Value: !Ref BackendSecurityGroup
     Export:
       Name: !Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup
-  EC2InstanceProfile:
-    Value: !Ref EC2InstanceProfile
-    Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-EC2InstanceProfile
 
 Resources:
   InternetFacingSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: PublicSecurityGroup
+      GroupDescription: ""
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
@@ -48,7 +44,7 @@ Resources:
   ApplicationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: ApplicationSecurityGroup
+      GroupDescription: ""
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
@@ -59,13 +55,31 @@ Resources:
   BackendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: PrivateSecurityGroup
+      GroupDescription: ""
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
           Value: !Sub ${ProjectName}.${EnvironName}.backend
         - Key: ProjectName
           Value: !Ref ProjectName
+
+  RedisIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      SourceSecurityGroupId: !Ref ApplicationSecurityGroup
+      IpProtocol: tcp
+      FromPort: 6379
+      ToPort: 6379
+
+  MySQLGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      SourceSecurityGroupId: !Ref ApplicationSecurityGroup
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
 
   S3BucketLog:
     Type: AWS::S3::Bucket

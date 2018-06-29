@@ -77,14 +77,10 @@ Outputs:
     Value: !Ref EnvironName
   InstanceName:
     Value: !Ref InstanceName
-    Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-ElastiCache-InstanceName
   Endpoint:
-    Value: !Sub
-      - ${EnvironName}-${InstanceName}.elasticache.${ProjectName}.${DomainName}
-      - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+    Value: !Ref Endpoint
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-ElastiCache-${InstanceName}-Endpoint
+      Name: !Sub ${ProjectName}-${EnvironName}-cache-${InstanceName}-endpoint
 
 Resources:
   Endpoint:
@@ -96,7 +92,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-${InstanceName}-elasticache.${ProjectName}.${DomainName}
+        - ${EnvironName}-cache-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       TTL: "900"
       ResourceRecords:
@@ -107,10 +103,8 @@ Resources:
     Properties:
       Description: InternalEndpoint
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_${InstanceName}_elasticache_endpoint
-      Value: !Sub
-        - ${EnvironName}-${InstanceName}-elasticache.${ProjectName}.${DomainName}
-        - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+      Name: !Sub ${ProjectName}_${EnvironName}_cache_${InstanceName}_endpoint
+      Value: !Ref Endpoint
 
   SubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
@@ -129,7 +123,6 @@ Resources:
       Properties:
         timeout: !Ref Timeout
 
-
   ReplicationGroup:
     Type: AWS::ElastiCache::ReplicationGroup
     Properties:
@@ -143,12 +136,14 @@ Resources:
       NumCacheClusters:         !Ref NumCacheClusters
       SecurityGroupIds:
         - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup"}
-
-  SecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-BackendSecurityGroup" } }
-      SourceSecurityGroupId: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
-      IpProtocol: tcp
-      FromPort: 6379
-      ToPort: 6379
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${EnvironName}-cache-${InstanceName}.${ProjectName}.${DomainName}.
+            - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironName
+          Value: !Ref EnvironName
+        - Key: InstanceName
+          Value: !Ref InstanceName
