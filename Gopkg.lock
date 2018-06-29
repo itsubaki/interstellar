@@ -26,6 +26,12 @@
   version = "0.2"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/itsubaki/env"
+  packages = ["."]
+  revision = "cd1ef7a0025b983ce516830621e9411a6945df11"
+
+[[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
@@ -58,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e5d7606f4dc1dff159ba04dd87a9b7d23c3444bf2501d124d1255090c553bcea"
+  inputs-digest = "638d9b9cc51d345bb67e6ef8e191d2ff4497195e4a43cd5d9590a4124e792a99"
   solver-name = "gps-cdcl"
   solver-version = 1

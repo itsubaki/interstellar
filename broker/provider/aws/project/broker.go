@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/itsubaki/env"
 	"github.com/itsubaki/interstellar/broker"
-	"github.com/itsubaki/interstellar/util"
 )
 
 type ProjectBroker struct {
@@ -16,7 +16,7 @@ func NewProjectBroker() *ProjectBroker {
 
 func (b *ProjectBroker) Config() *broker.Config {
 	return &broker.Config{
-		Port: util.Getenv("PORT", ":8080"),
+		Port: env.GetValue("PORT", ":8080"),
 	}
 }
 

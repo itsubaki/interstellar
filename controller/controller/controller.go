@@ -7,10 +7,10 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/itsubaki/env"
 	"github.com/itsubaki/interstellar/broker"
 	"github.com/itsubaki/interstellar/controller"
 	"github.com/itsubaki/interstellar/controller/repository"
-	"github.com/itsubaki/interstellar/util"
 )
 
 type Controller struct {
@@ -25,7 +25,7 @@ func NewController() *Controller {
 
 func (c *Controller) Config() *controller.Config {
 	return &controller.Config{
-		Port: util.Getenv("PORT", ":8080"),
+		Port: env.GetValue("PORT", ":8080"),
 	}
 }
 
