@@ -28,7 +28,7 @@ type Instance struct {
 	ServiceID  string            `json:"service_id"`
 	InstanceID string            `json:"instance_id"`
 	Parameter  map[string]string `json:"parameter"`
-	Output     map[string]string `json:"output"`
+	Output     map[string]string `json:"output,omitempty"`
 }
 
 type RegisterInput struct {
@@ -37,7 +37,7 @@ type RegisterInput struct {
 
 type RegisterOutput struct {
 	Status    int    `json:"status"`
-	Message   string `json:"message"`
+	Message   string `json:"message,omitempty"`
 	ServiceID string `json:"service_id,omitempty"`
 }
 

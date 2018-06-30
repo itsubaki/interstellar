@@ -87,6 +87,8 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 	}
 	instanceID := uuid.String()
 
+	// TODO required check
+
 	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, instanceID), "application/json", nil)
 	if err != nil {
 		return &controller.CreateInstanceOutput{
