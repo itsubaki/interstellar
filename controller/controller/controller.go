@@ -148,9 +148,35 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 		}
 	}
 
-	http.Get(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, in.InstanceID))
+	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s/describe", s.ServiceBrokerURL, in.InstanceID), "application/json", nil)
+	if err != nil {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("%v", err),
+		}
+	}
 
-	return nil
+	b, err := ioutil.ReadAll(out.Body)
+	if err != nil {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("read request body: %v", err),
+		}
+	}
+	defer out.Body.Close()
+
+	var res broker.DescribeOutput
+	if uerr := json.Unmarshal(b, &res); uerr != nil {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
+		}
+	}
+
+	return &controller.DescribeOutput{
+		Status:  http.StatusOK,
+		Message: res.Message,
+	}
 }
 
 func (c *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {

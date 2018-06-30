@@ -14,9 +14,10 @@ func Run(b ServiceBroker) {
 		c.JSON(200, b.Catalog())
 	})
 
-	g.GET("/v1/service/:instance_id", func(c *gin.Context) {
+	g.POST("/v1/service/:instance_id/describe", func(c *gin.Context) {
 		in := &DescribeInput{
 			InstanceID: c.Param("instance_id"),
+			Parameter:  make(map[string]string),
 		}
 		out := b.Describe(in)
 		c.JSON(out.Status, out)
