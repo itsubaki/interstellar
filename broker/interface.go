@@ -55,7 +55,7 @@ type ParamSpec struct {
 }
 
 type CreateInput struct {
-	InstanceID string            `json:"instance_id"`
+	InstanceID string            `json:"instance_id,omitempty"`
 	Parameter  map[string]string `json:"parameter"`
 }
 

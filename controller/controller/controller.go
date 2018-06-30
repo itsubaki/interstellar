@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -89,7 +90,23 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 
 	// TODO required check
 
-	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, instanceID), "application/json", nil)
+	input := &broker.CreateInput{
+		Parameter: in.Parameter,
+	}
+
+	jb, err := json.Marshal(input)
+	if err != nil {
+		return &controller.CreateOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("unmarshal request body: %v", err),
+		}
+	}
+
+	out, err := http.Post(
+		fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, instanceID),
+		"application/json",
+		bytes.NewReader(jb),
+	)
 	if err != nil {
 		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,

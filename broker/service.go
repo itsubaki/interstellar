@@ -1,6 +1,9 @@
 package broker
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -24,9 +27,21 @@ func Run(b ServiceBroker) {
 	})
 
 	g.POST("/v1/service/:instance_id", func(c *gin.Context) {
+		bytea, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(500, fmt.Errorf("read request body: %v", err))
+			return
+		}
+		defer c.Request.Body.Close()
+
 		in := &CreateInput{
 			InstanceID: c.Param("instance_id"),
 		}
+		if err := json.Unmarshal(bytea, &in); err != nil {
+			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
+			return
+		}
+
 		out := b.Create(in)
 		c.JSON(out.Status, out)
 	})
