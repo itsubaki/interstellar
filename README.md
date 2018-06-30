@@ -4,7 +4,7 @@
 ## up
 
 ```
-$ make up
+$ make docker-up
 
 docker-compose up -d
 Starting interstellar_broker.aws.database_1 ... done
@@ -27,7 +27,7 @@ ebd97426f6fc        broker.aws.cache      "./app"             16 hours ago      
 ## register
 
 ```
-$ make register
+$ make docker-register
 
 curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.project_1:8080"}'  | jq .
 {
@@ -160,7 +160,7 @@ curl -s localhost:9080/v1/service/c7aa976d-79a3-11e8-8e2f-0242ac120004 | jq .
 ```
 $ make create
 
-curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "c7aa976d-79a3-11e8-8e2f-0242ac120004", "name": "develop01"}' | jq .
+curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "c7aa976d-79a3-11e8-8e2f-0242ac120004", "name": "develop01", "parameter": {"project_name": "myproject", "cidr": "10.1.0.0/16", "region": "ap-northeast-1"}' | jq .
 {
   "status": 200,
   "instance": {
