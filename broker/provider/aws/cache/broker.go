@@ -55,6 +55,6 @@ func (b *CacheBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 	return &broker.UpdateOutput{}
 }
 
-func (b *CacheBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
-	return &broker.StatusOutput{}
+func (b *CacheBroker) Describe(in *broker.DescribeInput) *broker.DescribeOutput {
+	return &broker.DescribeOutput{}
 }

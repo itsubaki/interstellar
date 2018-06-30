@@ -69,6 +69,6 @@ func (b *ComputeBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOu
 	return &broker.UnbindingOutput{}
 }
 
-func (b *ComputeBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
-	return &broker.StatusOutput{}
+func (b *ComputeBroker) Describe(in *broker.DescribeInput) *broker.DescribeOutput {
+	return &broker.DescribeOutput{}
 }

@@ -36,12 +36,23 @@ func Run(s ServiceController) {
 	})
 
 	g.GET("/v1/service/:service_id", func(c *gin.Context) {
-		catalog := s.Catalog(c.Param("service_id"))
+		in := &CatalogInput{
+			ServiceID: c.Param("service_id"),
+		}
+		catalog := s.Catalog(in)
 		c.JSON(catalog.Status, catalog)
 	})
 
 	g.GET("/v1/instance", func(c *gin.Context) {
 		out := s.Instance()
+		c.JSON(out.Status, out)
+	})
+
+	g.GET("/v1/instance/:instance_id", func(c *gin.Context) {
+		in := &DescribeInput{
+			InstanceID: c.Param("instance_id"),
+		}
+		out := s.Describe(in)
 		c.JSON(out.Status, out)
 	})
 
@@ -53,13 +64,13 @@ func Run(s ServiceController) {
 		}
 		defer c.Request.Body.Close()
 
-		var in CreateInstanceInput
+		var in CreateInput
 		if err := json.Unmarshal(b, &in); err != nil {
 			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
 			return
 		}
 
-		out := s.CreateInstance(&in)
+		out := s.Create(&in)
 		c.JSON(out.Status, out)
 	})
 

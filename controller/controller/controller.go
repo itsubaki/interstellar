@@ -36,12 +36,12 @@ func (c *Controller) Service() *controller.ServiceOutput {
 	}
 }
 
-func (c *Controller) Catalog(id string) *controller.CatalogOutput {
-	s, ok := c.ServiceRepository.FindByInstanceID(id)
+func (c *Controller) Catalog(in *controller.CatalogInput) *controller.CatalogOutput {
+	s, ok := c.ServiceRepository.FindByID(in.ServiceID)
 	if !ok {
 		return &controller.CatalogOutput{
 			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("service=%s not found", id),
+			Message: fmt.Sprintf("service=%s not found", in.ServiceID),
 		}
 	}
 
@@ -50,7 +50,7 @@ func (c *Controller) Catalog(id string) *controller.CatalogOutput {
 		return &controller.CatalogOutput{
 			Status:    http.StatusBadRequest,
 			ServiceID: s.ServiceID,
-			Message:   fmt.Sprintf("catalog=%s not found", id),
+			Message:   fmt.Sprintf("catalog=%s not found", in.ServiceID),
 		}
 	}
 
@@ -69,10 +69,10 @@ func (c *Controller) Instance() *controller.InstanceOutput {
 	}
 }
 
-func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *controller.CreateInstanceOutput {
-	s, ok := c.ServiceRepository.FindByInstanceID(in.ServiceID)
+func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput {
+	s, ok := c.ServiceRepository.FindByID(in.ServiceID)
 	if !ok {
-		return &controller.CreateInstanceOutput{
+		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("service=%s not found", in.ServiceID),
 		}
@@ -80,7 +80,7 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	uuid, err := uuid.NewUUID()
 	if err != nil {
-		return &controller.CreateInstanceOutput{
+		return &controller.CreateOutput{
 			Status:  http.StatusInternalServerError,
 			Message: fmt.Sprintf("new uuid: %v", err),
 		}
@@ -91,7 +91,7 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, instanceID), "application/json", nil)
 	if err != nil {
-		return &controller.CreateInstanceOutput{
+		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("%v", err),
 		}
@@ -99,7 +99,7 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	b, err := ioutil.ReadAll(out.Body)
 	if err != nil {
-		return &controller.CreateInstanceOutput{
+		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("read request body: %v", err),
 		}
@@ -108,7 +108,7 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	var res broker.CreateOutput
 	if uerr := json.Unmarshal(b, &res); uerr != nil {
-		return &controller.CreateInstanceOutput{
+		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,
 			Message: fmt.Sprintf("unmarshal request body: %v", uerr),
 		}
@@ -124,11 +124,33 @@ func (c *Controller) CreateInstance(in *controller.CreateInstanceInput) *control
 
 	c.InstanceRepository.Insert(i)
 
-	return &controller.CreateInstanceOutput{
+	return &controller.CreateOutput{
 		Status:   http.StatusOK,
 		Instance: i,
 	}
 
+}
+
+func (c *Controller) Describe(in *controller.DescribeInput) *controller.DescribeOutput {
+	i, ok := c.InstanceRepository.FindByID(in.InstanceID)
+	if !ok {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("instance=%s not found", in.InstanceID),
+		}
+	}
+
+	s, ok := c.ServiceRepository.FindByID(i.ServiceID)
+	if !ok {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("service=%s not found", i.ServiceID),
+		}
+	}
+
+	http.Get(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, in.InstanceID))
+
+	return nil
 }
 
 func (c *Controller) Register(in *controller.RegisterInput) *controller.RegisterOutput {

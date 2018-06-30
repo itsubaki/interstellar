@@ -28,7 +28,7 @@ type ServiceBroker interface {
 	// 202 Accepted: instance update is in progress
 	Update(in *UpdateInput) *UpdateOutput
 
-	Status(in *StatusInput) *StatusOutput
+	Describe(in *DescribeInput) *DescribeOutput
 }
 
 type Config struct {
@@ -105,11 +105,12 @@ type UnbindingOutput struct {
 	Output  map[string]string `json:"output,omitempty"`
 }
 
-type StatusInput struct {
-	InstanceID string `json:"instance_id"`
+type DescribeInput struct {
+	InstanceID string            `json:"instance_id"`
+	Parameter  map[string]string `json:"parameter"`
 }
 
-type StatusOutput struct {
+type DescribeOutput struct {
 	Status  int               `json:"status"`
 	Message string            `json:"message"`
 	Output  map[string]string `json:"output,omitempty"`

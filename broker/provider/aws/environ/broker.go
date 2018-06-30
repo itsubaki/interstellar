@@ -62,6 +62,6 @@ func (b *EnvironBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOu
 	return &broker.UnbindingOutput{}
 }
 
-func (b *EnvironBroker) Status(in *broker.StatusInput) *broker.StatusOutput {
-	return &broker.StatusOutput{}
+func (b *EnvironBroker) Describe(in *broker.DescribeInput) *broker.DescribeOutput {
+	return &broker.DescribeOutput{}
 }

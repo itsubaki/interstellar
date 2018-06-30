@@ -7,10 +7,11 @@ type ServiceController interface {
 
 	Register(in *RegisterInput) *RegisterOutput
 	Service() *ServiceOutput
-	Catalog(id string) *CatalogOutput
+	Catalog(in *CatalogInput) *CatalogOutput
 
 	Instance() *InstanceOutput
-	CreateInstance(in *CreateInstanceInput) *CreateInstanceOutput
+	Describe(in *DescribeInput) *DescribeOutput
+	Create(in *CreateInput) *CreateOutput
 }
 
 type Config struct {
@@ -46,6 +47,10 @@ type ServiceOutput struct {
 	Service []*Service `json:"service"`
 }
 
+type CatalogInput struct {
+	ServiceID string `json:"service_id"`
+}
+
 type CatalogOutput struct {
 	Status    int             `json:"status"`
 	Message   string          `json:"message,omitempty"`
@@ -59,14 +64,23 @@ type InstanceOutput struct {
 	Instance []*Instance `json:"instance,omitempty"`
 }
 
-type CreateInstanceInput struct {
+type CreateInput struct {
 	Name      string            `json:"name"`
 	ServiceID string            `json:"service_id"`
 	Parameter map[string]string `json:"parameter"`
 }
 
-type CreateInstanceOutput struct {
+type CreateOutput struct {
 	Status   int       `json:"status"`
 	Message  string    `json:"message,omitempty"`
 	Instance *Instance `json:"instance,omitempty"`
+}
+
+type DescribeInput struct {
+	InstanceID string `json:"instance_id"`
+}
+
+type DescribeOutput struct {
+	Status  int    `json:"status"`
+	Message string `json:"message,omitempty"`
 }
