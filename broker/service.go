@@ -2,6 +2,7 @@ package broker
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,6 +32,7 @@ func Run(b ServiceBroker) {
 
 	log.Printf("config=%v\n", b.Config())
 	if err := g.Run(b.Config().Port); err != nil {
-		log.Fatalf("run broker: %v", err)
+		log.Printf("run broker: %v", err)
+		os.Exit(1)
 	}
 }

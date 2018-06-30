@@ -32,7 +32,8 @@ type ServiceBroker interface {
 }
 
 type Config struct {
-	Port string
+	Port     string
+	Template string
 }
 
 type Catalog struct {

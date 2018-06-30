@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/itsubaki/env"
@@ -8,16 +10,29 @@ import (
 )
 
 type ProjectBroker struct {
+	config   *broker.Config
+	template string
 }
 
-func NewProjectBroker() *ProjectBroker {
-	return &ProjectBroker{}
+func NewProjectBroker() (*ProjectBroker, error) {
+	c := &broker.Config{
+		Port:     env.GetValue("PORT", ":8080"),
+		Template: env.GetValue("TEMPLATE", "./template.yml"),
+	}
+
+	f, err := ioutil.ReadFile(c.Template)
+	if err != nil {
+		return nil, fmt.Errorf("read file: %v", err)
+	}
+
+	return &ProjectBroker{
+		config:   c,
+		template: string(f),
+	}, nil
 }
 
 func (b *ProjectBroker) Config() *broker.Config {
-	return &broker.Config{
-		Port: env.GetValue("PORT", ":8080"),
-	}
+	return b.config
 }
 
 func (b *ProjectBroker) Catalog() *broker.Catalog {

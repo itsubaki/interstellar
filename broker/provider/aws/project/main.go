@@ -1,7 +1,18 @@
 package main
 
-import "github.com/itsubaki/interstellar/broker"
+import (
+	"log"
+	"os"
+
+	"github.com/itsubaki/interstellar/broker"
+)
 
 func main() {
-	broker.Run(NewProjectBroker())
+	b, err := NewProjectBroker()
+	if err != nil {
+		log.Printf("new broker: %v", err)
+		os.Exit(1)
+	}
+
+	broker.Run(b)
 }
