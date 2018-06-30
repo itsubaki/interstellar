@@ -88,8 +88,6 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 	}
 	instanceID := uuid.String()
 
-	// TODO required check
-
 	input := &broker.CreateInput{
 		Parameter: in.Parameter,
 	}
@@ -139,13 +137,19 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 		Output:     res.Output,
 	}
 
-	c.InstanceRepository.Insert(i)
-
-	return &controller.CreateOutput{
-		Status:   http.StatusOK,
-		Instance: i,
+	if res.Status == http.StatusOK {
+		c.InstanceRepository.Insert(i)
+		return &controller.CreateOutput{
+			Status:   res.Status,
+			Message:  res.Message,
+			Instance: i,
+		}
 	}
 
+	return &controller.CreateOutput{
+		Status:  res.Status,
+		Message: res.Message,
+	}
 }
 
 func (c *Controller) Describe(in *controller.DescribeInput) *controller.DescribeOutput {
@@ -165,7 +169,23 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 		}
 	}
 
-	out, err := http.Post(fmt.Sprintf("%s/v1/service/%s/describe", s.ServiceBrokerURL, in.InstanceID), "application/json", nil)
+	input := &broker.DescribeInput{
+		InstanceID: in.InstanceID,
+		Parameter:  i.Parameter,
+	}
+	jb, err := json.Marshal(input)
+	if err != nil {
+		return &controller.DescribeOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("unmarshal request body: %v", err),
+		}
+	}
+
+	out, err := http.Post(
+		fmt.Sprintf("%s/v1/service/%s/describe", s.ServiceBrokerURL, in.InstanceID),
+		"application/json",
+		bytes.NewReader(jb),
+	)
 	if err != nil {
 		return &controller.DescribeOutput{
 			Status:  http.StatusBadRequest,
@@ -191,7 +211,7 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 	}
 
 	return &controller.DescribeOutput{
-		Status:  http.StatusOK,
+		Status:  res.Status,
 		Message: res.Message,
 	}
 }
