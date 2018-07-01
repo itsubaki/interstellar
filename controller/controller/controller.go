@@ -134,10 +134,19 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 		InstanceID: instanceID,
 		ServiceID:  s.ServiceID,
 		Parameter:  in.Parameter,
-		Output:     res.Output,
 	}
 
-	if res.Status == http.StatusOK {
+	if res.Status == http.StatusOK || res.Status == http.StatusCreated {
+		i.Output = res.Output
+		c.InstanceRepository.Insert(i)
+		return &controller.CreateOutput{
+			Status:   res.Status,
+			Message:  res.Message,
+			Instance: i,
+		}
+	}
+
+	if res.Status == http.StatusAccepted {
 		c.InstanceRepository.Insert(i)
 		return &controller.CreateOutput{
 			Status:   res.Status,
