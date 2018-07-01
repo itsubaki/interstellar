@@ -28,6 +28,9 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 		Require:  []string{"aws_project"},
 		Bindable: true,
 		ParameterSpec: []*broker.ParamSpec{
+			{Name: "integration_role_arn", Required: false},
+			{Name: "region", Required: true},
+
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 		},

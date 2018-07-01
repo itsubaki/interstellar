@@ -28,6 +28,9 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: false,
 		ParameterSpec: []*broker.ParamSpec{
+			{Name: "integration_role_arn", Required: false},
+			{Name: "region", Required: true},
+
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 			{Name: "instance_name", Required: true},
