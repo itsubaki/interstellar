@@ -25,9 +25,8 @@ func (b *CacheBroker) Catalog() *broker.Catalog {
 			"aws",
 			"cache",
 		},
-		Require:  []string{"aws_project", "aws_environ"},
 		Bindable: false,
-		ParameterSpec: []*broker.ParamSpec{
+		ParameterSpec: []broker.ParamSpec{
 			{Name: "integration_role_arn", Required: false},
 			{Name: "region", Required: true},
 

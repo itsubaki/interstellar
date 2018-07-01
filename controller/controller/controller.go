@@ -31,9 +31,15 @@ func (c *Controller) Config() *controller.Config {
 }
 
 func (c *Controller) Service() *controller.ServiceOutput {
+	all := c.ServiceRepository.SelectAll()
+	service := []controller.Service{}
+	for i := range all {
+		service = append(service, *all[i])
+	}
+
 	return &controller.ServiceOutput{
 		Status:  http.StatusOK,
-		Service: c.ServiceRepository.SelectAll(),
+		Service: service,
 	}
 }
 
@@ -64,9 +70,15 @@ func (c *Controller) Catalog(in *controller.CatalogInput) *controller.CatalogOut
 }
 
 func (c *Controller) Instance() *controller.InstanceOutput {
+	all := c.InstanceRepository.SelectAll()
+	instance := []controller.Instance{}
+	for i := range all {
+		instance = append(instance, *all[i])
+	}
+
 	return &controller.InstanceOutput{
 		Status:   http.StatusOK,
-		Instance: c.InstanceRepository.SelectAll(),
+		Instance: instance,
 	}
 }
 

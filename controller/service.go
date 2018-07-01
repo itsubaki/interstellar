@@ -5,24 +5,38 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/itsubaki/env"
 )
 
 func Run(s ServiceController) {
 	g := gin.New()
 
+	g.GET("", func(c *gin.Context) {
+		path := env.GetValue("INDEX", "./index.html")
+		file, err := ioutil.ReadFile(path)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("read html: %v", err))
+			return
+		}
+
+		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+		c.Writer.Write(file)
+	})
+
 	g.POST("/v1/register", func(c *gin.Context) {
 		b, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
-			c.JSON(500, fmt.Errorf("read request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("read request body: %v", err))
 			return
 		}
 		defer c.Request.Body.Close()
 
 		var in RegisterInput
 		if err := json.Unmarshal(b, &in); err != nil {
-			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("unmarshal request body: %v", err))
 			return
 		}
 
@@ -59,14 +73,14 @@ func Run(s ServiceController) {
 	g.POST("/v1/instance", func(c *gin.Context) {
 		b, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
-			c.JSON(500, fmt.Errorf("read request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("read request body: %v", err))
 			return
 		}
 		defer c.Request.Body.Close()
 
 		var in CreateInput
 		if err := json.Unmarshal(b, &in); err != nil {
-			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("unmarshal request body: %v", err))
 			return
 		}
 

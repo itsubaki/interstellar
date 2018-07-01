@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>interstellar</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+    class Register extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          url: "http://localhost:9082"
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+      }
+
+      handleChange(event) {
+        this.setState({url: event.target.value});
+      }
+
+      handleSubmit(event) {
+        var data = {
+          url: this.state.url
+        };
+
+        fetch('http://localhost:9080/v1/register', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        event.preventDefault();
+      }
+
+      render() {
+        return (
+          <div className="register">
+            <form onSubmit={this.handleSubmit}>
+              <label>
+                url: <input type="text" value={this.state.url} onChange={this.handleChange}/>
+              </label>
+              <input type="submit" value="register" />
+            </form>
+          </div>
+        );
+      }
+    }
+
+    class Service extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          service: []
+        };
+      }
+
+      componentDidMount() {
+        fetch("http://localhost:9080/v1/service")
+        .then(res => res.json())
+        .then(data => this.setState({service: data.service}));
+      }
+
+      render() {
+        const { service } = this.state;
+
+        return (
+          <div className="service">
+            <h3>service</h3>
+            {service.map(s =>
+              <div key={s.service_id}>
+                <a href={"http://localhost:9080/v1/service/" + s.service_id}>{s.name}</a>
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+
+    class Instance extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          instance: []
+        };
+      }
+
+      componentDidMount() {
+        fetch("http://localhost:9080/v1/instance")
+        .then(res => res.json())
+        .then(data => this.setState({instance: data.instance}));
+      }
+
+      render() {
+        const { instance } = this.state;
+
+        return (
+          <div className="instance">
+            <h3>instance</h3>
+            {instance.map(i =>
+              <div key={i.instance_id}>
+                <a href={"http://localhost:9080/v1/instance/" + i.instance_id}>{i.name}</a>
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+
+    class App extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+
+      render() {
+        return (
+          <div className="app">
+            <Service />
+            <Register />
+            <Instance />
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
+
+    </script>
+  </body>
+</html>

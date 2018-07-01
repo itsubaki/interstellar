@@ -5,7 +5,7 @@ build:
 	set -x
 	-rm -rf ${BUILD}
 
-	mkdir -p ${BUILD}/controller/bin
+	mkdir -p ${BUILD}/controller/{bin,conf}
 	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
 
 	cd controller/controller;        go build -o ${BUILD}/controller/bin/controller
@@ -15,6 +15,7 @@ build:
 	cd broker/provider/aws/cache;    go build -o ${BUILD}/broker/cache/bin/cache
 	cd broker/provider/aws/compute;  go build -o ${BUILD}/broker/compute/bin/compute
 
+	cp controller/index.html                     ${BUILD}/controller/conf
 	cp broker/provider/aws/project/template.yml  ${BUILD}/broker/project/conf
 	cp broker/provider/aws/environ/template.yml  ${BUILD}/broker/environ/conf
 	cp broker/provider/aws/database/template.yml ${BUILD}/broker/database/conf
@@ -24,7 +25,7 @@ build:
 up:
 	set -x
 
-	PORT=:9080 ${BUILD}/controller/bin/controller
+	PORT=:9080 INDEX=./controller/index.html                       ${BUILD}/controller/bin/controller
 	PORT=:9081 TEMPLATE=${BUILD}/broker/project/conf/template.yml  ${BUILD}/broker/project/bin/project
 	PORT=:9082 TEMPLATE=${BUILD}/broker/environ/conf/template.yml  ${BUILD}/broker/environ/bin/environ
 	PORT=:9083 TEMPLATE=${BUILD}/broker/database/conf/template.yml ${BUILD}/broker/database/bin/database

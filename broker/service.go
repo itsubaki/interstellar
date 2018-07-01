@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ func Run(b ServiceBroker) {
 	g := gin.New()
 
 	g.GET("/v1/catalog", func(c *gin.Context) {
-		c.JSON(200, b.Catalog())
+		c.JSON(http.StatusOK, b.Catalog())
 	})
 
 	g.POST("/v1/service/:instance_id/describe", func(c *gin.Context) {
@@ -29,7 +30,7 @@ func Run(b ServiceBroker) {
 	g.POST("/v1/service/:instance_id", func(c *gin.Context) {
 		bytea, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
-			c.JSON(500, fmt.Errorf("read request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("read request body: %v", err))
 			return
 		}
 		defer c.Request.Body.Close()
@@ -38,7 +39,7 @@ func Run(b ServiceBroker) {
 			InstanceID: c.Param("instance_id"),
 		}
 		if err := json.Unmarshal(bytea, &in); err != nil {
-			c.JSON(500, fmt.Errorf("unmarshal request body: %v", err))
+			c.JSON(http.StatusInternalServerError, fmt.Errorf("unmarshal request body: %v", err))
 			return
 		}
 

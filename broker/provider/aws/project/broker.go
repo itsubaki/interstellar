@@ -46,9 +46,8 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 			"aws",
 			"project",
 		},
-		Require:  []string{},
 		Bindable: false,
-		ParameterSpec: []*broker.ParamSpec{
+		ParameterSpec: []broker.ParamSpec{
 			{Name: "integration_role_arn", Required: false},
 			{Name: "region", Required: true},
 
@@ -61,33 +60,33 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 }
 
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	sess := session.Must(session.NewSession())
-	cfn := cloudformation.New(
-		sess,
-		&aws.Config{
-			Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
-			Region:      aws.String(in.Parameter["region"]),
-		})
-
-	param := []*cloudformation.Parameter{
-		{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
-		{ParameterKey: aws.String("DomainName"), ParameterValue: aws.String(in.Parameter["domain"])},
-		{ParameterKey: aws.String("AccountId"), ParameterValue: aws.String(in.Parameter["aws_account_id"])},
-		{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
-	}
-
-	input := &cloudformation.CreateStackInput{
-		StackName:    &in.InstanceID,
-		Parameters:   param,
-		TemplateBody: &b.template,
-	}
-
-	if _, err := cfn.CreateStack(input); err != nil {
-		return &broker.CreateOutput{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("create stack: %v", err),
-		}
-	}
+	// sess := session.Must(session.NewSession())
+	// cfn := cloudformation.New(
+	// 	sess,
+	// 	&aws.Config{
+	// 		Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
+	// 		Region:      aws.String(in.Parameter["region"]),
+	// 	})
+	//
+	// param := []*cloudformation.Parameter{
+	// 	{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
+	// 	{ParameterKey: aws.String("DomainName"), ParameterValue: aws.String(in.Parameter["domain"])},
+	// 	{ParameterKey: aws.String("AccountId"), ParameterValue: aws.String(in.Parameter["aws_account_id"])},
+	// 	{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
+	// }
+	//
+	// input := &cloudformation.CreateStackInput{
+	// 	StackName:    &in.InstanceID,
+	// 	Parameters:   param,
+	// 	TemplateBody: &b.template,
+	// }
+	//
+	// if _, err := cfn.CreateStack(input); err != nil {
+	// 	return &broker.CreateOutput{
+	// 		Status:  http.StatusBadRequest,
+	// 		Message: fmt.Sprintf("create stack: %v", err),
+	// 	}
+	// }
 
 	return &broker.CreateOutput{
 		Status:  http.StatusAccepted,

@@ -43,8 +43,8 @@ type RegisterOutput struct {
 }
 
 type ServiceOutput struct {
-	Status  int        `json:"status"`
-	Service []*Service `json:"service"`
+	Status  int       `json:"status"`
+	Service []Service `json:"service"`
 }
 
 type CatalogInput struct {
@@ -59,9 +59,9 @@ type CatalogOutput struct {
 }
 
 type InstanceOutput struct {
-	Status   int         `json:"status"`
-	Message  string      `json:"message,omitempty"`
-	Instance []*Instance `json:"instance,omitempty"`
+	Status   int        `json:"status"`
+	Message  string     `json:"message,omitempty"`
+	Instance []Instance `json:"instance"`
 }
 
 type CreateInput struct {
