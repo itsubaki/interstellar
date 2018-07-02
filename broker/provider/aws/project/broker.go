@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -11,11 +12,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/itsubaki/env"
 	"github.com/itsubaki/interstellar/broker"
+	"github.com/itsubaki/interstellar/broker/repository"
 )
 
 type ProjectBroker struct {
 	config   *broker.Config
 	template string
+	instance repository.InstanceRepository
 }
 
 func NewProjectBroker() (*ProjectBroker, error) {
@@ -32,6 +35,7 @@ func NewProjectBroker() (*ProjectBroker, error) {
 	return &ProjectBroker{
 		config:   c,
 		template: string(f),
+		instance: repository.InstanceRepository{},
 	}, nil
 }
 
@@ -60,37 +64,74 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 }
 
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	// sess := session.Must(session.NewSession())
-	// cfn := cloudformation.New(
-	// 	sess,
-	// 	&aws.Config{
-	// 		Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
-	// 		Region:      aws.String(in.Parameter["region"]),
-	// 	})
-	//
-	// param := []*cloudformation.Parameter{
-	// 	{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
-	// 	{ParameterKey: aws.String("DomainName"), ParameterValue: aws.String(in.Parameter["domain"])},
-	// 	{ParameterKey: aws.String("AccountId"), ParameterValue: aws.String(in.Parameter["aws_account_id"])},
-	// 	{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
-	// }
-	//
-	// input := &cloudformation.CreateStackInput{
-	// 	StackName:    &in.InstanceID,
-	// 	Parameters:   param,
-	// 	TemplateBody: &b.template,
-	// }
-	//
-	// if _, err := cfn.CreateStack(input); err != nil {
-	// 	return &broker.CreateOutput{
-	// 		Status:  http.StatusBadRequest,
-	// 		Message: fmt.Sprintf("create stack: %v", err),
-	// 	}
-	// }
+	sess := session.Must(session.NewSession())
+	cfn := cloudformation.New(
+		sess,
+		&aws.Config{
+			Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
+			Region:      aws.String(in.Parameter["region"]),
+		})
+
+	param := []*cloudformation.Parameter{
+		{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
+		{ParameterKey: aws.String("DomainName"), ParameterValue: aws.String(in.Parameter["domain"])},
+		{ParameterKey: aws.String("AccountId"), ParameterValue: aws.String(in.Parameter["aws_account_id"])},
+		{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
+	}
+
+	input := &cloudformation.CreateStackInput{
+		StackName:    &in.InstanceID,
+		Parameters:   param,
+		TemplateBody: &b.template,
+	}
+
+	if _, err := cfn.CreateStack(input); err != nil {
+		return &broker.CreateOutput{
+			Status:  http.StatusBadRequest,
+			Message: fmt.Sprintf("create stack: %v", err),
+		}
+	}
+
+	i := &broker.Instance{
+		InstanceID: in.InstanceID,
+		Parameter:  in.Parameter,
+	}
+
+	b.instance.Insert(i)
+
+	go func() {
+		input := &cloudformation.DescribeStacksInput{
+			StackName: &in.InstanceID,
+		}
+
+		if err := cfn.WaitUntilStackCreateComplete(input); err != nil {
+			log.Printf("wait until stack create complete %s: %v", in.InstanceID, err)
+			return
+		}
+
+		desc, err := cfn.DescribeStacks(input)
+		if err != nil {
+			log.Printf("desctibe stack %s: %v", in.InstanceID, err)
+			return
+		}
+
+		out := make(map[string]string)
+		for i := range desc.Stacks[0].Outputs {
+			o := desc.Stacks[0].Outputs[i]
+			out[*o.OutputKey] = *o.OutputValue
+		}
+
+		i.Status = *desc.Stacks[0].StackStatus
+		i.Output = out
+		if err := b.instance.Update(i); err != nil {
+			log.Printf("update instance_id=%s: %v", in.InstanceID, err)
+		}
+	}()
 
 	return &broker.CreateOutput{
-		Status:  http.StatusAccepted,
-		Message: "Accepted",
+		Status:   http.StatusAccepted,
+		Message:  "Accepted",
+		Instance: i,
 	}
 }
 
@@ -123,36 +164,16 @@ func (b *ProjectBroker) Unbinding(in *broker.UnbindingInput) *broker.UnbindingOu
 }
 
 func (b *ProjectBroker) Describe(in *broker.DescribeInput) *broker.DescribeOutput {
-	sess := session.Must(session.NewSession())
-	cfn := cloudformation.New(
-		sess,
-		&aws.Config{
-			Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
-			Region:      aws.String(in.Parameter["region"]),
-		})
-
-	input := &cloudformation.DescribeStacksInput{
-		StackName: &in.InstanceID,
-	}
-
-	desc, err := cfn.DescribeStacks(input)
-	if err != nil {
+	i, ok := b.instance.FindByID(in.InstanceID)
+	if !ok {
 		return &broker.DescribeOutput{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("describe stack: %v", err),
+			Status:  http.StatusOK,
+			Message: fmt.Sprintf("instance=%s not found", in.InstanceID),
 		}
-	}
-	s0 := desc.Stacks[0]
-
-	out := make(map[string]string)
-	for i := range s0.Outputs {
-		o := s0.Outputs[i]
-		out[*o.OutputKey] = *o.OutputValue
 	}
 
 	return &broker.DescribeOutput{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("%s", *s0.StackStatus),
-		Output:  out,
+		Status:   http.StatusOK,
+		Instance: i,
 	}
 }

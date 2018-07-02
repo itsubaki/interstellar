@@ -69,10 +69,10 @@ Outputs:
     Value: !Ref Region
     Export:
       Name: !Sub ${ProjectName}-Region
-  Certificate:
-    Value: !Ref Certificate
-    Export:
-      Name: !Sub ${ProjectName}-Certificate
+  # Certificate:
+  #   Value: !Ref Certificate
+  #   Export:
+  #     Name: !Sub ${ProjectName}-Certificate
   VPC:
     Value: !Ref VPC
     Export:
@@ -295,66 +295,66 @@ Resources:
         Comment: ""
       Name: !Sub ${ProjectName}.${DomainName}.
 
-  Certificate:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Sub *.${ProjectName}.${DomainName}
-      DomainValidationOptions:
-        - DomainName: !Sub *.${ProjectName}.${DomainName}
-          ValidationDomain: !Ref DomainName
-      SubjectAlternativeNames:
-        - !Sub ${ProjectName}.${DomainName}
-
-  S3BucketLog:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
-    Properties:
-      BucketName: !Sub log.${ProjectName}.${DomainName}
-      Tags:
-        - Key: Name
-          Value: !Sub log.${ProjectName}.${DomainName}
-        - Key: ProjectName
-          Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
-
-  S3BucketLogPolicy:
-    DependsOn: S3BucketLog
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3BucketLog
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: AWSCloudTrailAclCheck
-            Effect: Allow
-            Principal:
-              Service: cloudtrail.amazonaws.com
-            Action: s3:GetBucketAcl
-            Resource: !Sub arn:aws:s3:::${S3BucketLog}
-          - Sid: AWSCloudTrailWrite
-            Effect: Allow
-            Principal:
-              Service: cloudtrail.amazonaws.com
-            Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
-            Condition:
-              StringEquals:
-                s3:x-amz-acl: bucket-owner-full-control
-
-  CloudTrail:
-    DependsOn: BucketPolicy
-    Type: AWS::CloudTrail::Trail
-    Properties:
-      S3BucketName: !Sub log.${ProjectName}.${DomainName}
-      IncludeGlobalServiceEvents: true
-      EnableLogFileValidation: true
-      IsMultiRegionTrail: true
-      IsLogging: true
-      Tags:
-        - Key: Name
-          Value: !Sub log.${ProjectName}.${DomainName}
-        - Key: ProjectName
-          Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+  # Certificate:
+  #   Type: AWS::CertificateManager::Certificate
+  #   Properties:
+  #     DomainName: !Sub *.${ProjectName}.${DomainName}
+  #     DomainValidationOptions:
+  #       - DomainName: !Sub *.${ProjectName}.${DomainName}
+  #         ValidationDomain: !Ref DomainName
+  #     SubjectAlternativeNames:
+  #       - !Sub ${ProjectName}.${DomainName}
+  #
+  # S3BucketLog:
+  #   Type: AWS::S3::Bucket
+  #   DeletionPolicy: Retain
+  #   Properties:
+  #     BucketName: !Sub log.${ProjectName}.${DomainName}
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub log.${ProjectName}.${DomainName}
+  #       - Key: ProjectName
+  #         Value: !Ref ProjectName
+  #       - Key: EnvironName
+  #         Value: !Ref EnvironName
+  #
+  # S3BucketLogPolicy:
+  #   DependsOn: S3BucketLog
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     Bucket: !Ref S3BucketLog
+  #     PolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Sid: AWSCloudTrailAclCheck
+  #           Effect: Allow
+  #           Principal:
+  #             Service: cloudtrail.amazonaws.com
+  #           Action: s3:GetBucketAcl
+  #           Resource: !Sub arn:aws:s3:::${S3BucketLog}
+  #         - Sid: AWSCloudTrailWrite
+  #           Effect: Allow
+  #           Principal:
+  #             Service: cloudtrail.amazonaws.com
+  #           Action: s3:PutObject
+  #           Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
+  #           Condition:
+  #             StringEquals:
+  #               s3:x-amz-acl: bucket-owner-full-control
+  #
+  # CloudTrail:
+  #   DependsOn: BucketPolicy
+  #   Type: AWS::CloudTrail::Trail
+  #   Properties:
+  #     S3BucketName: !Sub log.${ProjectName}.${DomainName}
+  #     IncludeGlobalServiceEvents: true
+  #     EnableLogFileValidation: true
+  #     IsMultiRegionTrail: true
+  #     IsLogging: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub log.${ProjectName}.${DomainName}
+  #       - Key: ProjectName
+  #         Value: !Ref ProjectName
+  #       - Key: EnvironName
+  #         Value: !Ref EnvironName

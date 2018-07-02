@@ -41,13 +41,15 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 // ExportValue
 //  - endpoint
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	out := make(map[string]string)
-	out["endpoint"] = "https://${environ}-${instance_name}.${project_name}.{domain}"
+	i := &broker.Instance{
+		InstanceID: in.InstanceID,
+		Parameter:  in.Parameter,
+	}
 
 	return &broker.CreateOutput{
-		Status:  202,
-		Message: "Accepted",
-		Output:  out,
+		Status:   202,
+		Message:  "Accepted",
+		Instance: i,
 	}
 }
 

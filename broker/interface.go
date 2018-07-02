@@ -53,15 +53,22 @@ type ParamSpec struct {
 	Description  string   `json:"description"`
 }
 
+type Instance struct {
+	InstanceID string            `json:"instance_id"`
+	Status     string            `json:"status"`
+	Parameter  map[string]string `json:"parameter"`
+	Output     map[string]string `json:"output,omitempty"`
+}
+
 type CreateInput struct {
 	InstanceID string            `json:"instance_id,omitempty"`
 	Parameter  map[string]string `json:"parameter"`
 }
 
 type CreateOutput struct {
-	Status  int               `json:"status"`
-	Message string            `json:"message"`
-	Output  map[string]string `json:"output,omitempty"`
+	Status   int       `json:"status"`
+	Message  string    `json:"message"`
+	Instance *Instance `json:"instance,omitempty"`
 }
 
 type DeleteInput struct {
@@ -105,12 +112,11 @@ type UnbindingOutput struct {
 }
 
 type DescribeInput struct {
-	InstanceID string            `json:"instance_id"`
-	Parameter  map[string]string `json:"parameter"`
+	InstanceID string `json:"instance_id"`
 }
 
 type DescribeOutput struct {
-	Status  int               `json:"status"`
-	Message string            `json:"message"`
-	Output  map[string]string `json:"output,omitempty"`
+	Status   int       `json:"status"`
+	Message  string    `json:"message"`
+	Instance *Instance `json:"instance"`
 }

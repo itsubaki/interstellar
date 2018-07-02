@@ -15,9 +15,9 @@ import (
 )
 
 type Controller struct {
-	ServiceRepository  repository.ServiceRepository
-	CatalogRepository  repository.CatalogRepository
-	InstanceRepository repository.InstanceRepository
+	service  repository.ServiceRepository
+	catalog  repository.CatalogRepository
+	instance repository.InstanceRepository
 }
 
 func NewController() *Controller {
@@ -31,7 +31,7 @@ func (c *Controller) Config() *controller.Config {
 }
 
 func (c *Controller) Service() *controller.ServiceOutput {
-	all := c.ServiceRepository.SelectAll()
+	all := c.service.SelectAll()
 	service := []controller.Service{}
 	for i := range all {
 		service = append(service, *all[i])
@@ -44,7 +44,7 @@ func (c *Controller) Service() *controller.ServiceOutput {
 }
 
 func (c *Controller) Catalog(in *controller.CatalogInput) *controller.CatalogOutput {
-	s, ok := c.ServiceRepository.FindByID(in.ServiceID)
+	s, ok := c.service.FindByID(in.ServiceID)
 	if !ok {
 		return &controller.CatalogOutput{
 			Status:  http.StatusBadRequest,
@@ -52,7 +52,7 @@ func (c *Controller) Catalog(in *controller.CatalogInput) *controller.CatalogOut
 		}
 	}
 
-	catalog, ok := c.CatalogRepository.FindByName(s.Name)
+	catalog, ok := c.catalog.FindByName(s.Name)
 	if !ok {
 		return &controller.CatalogOutput{
 			Status:    http.StatusBadRequest,
@@ -70,7 +70,7 @@ func (c *Controller) Catalog(in *controller.CatalogInput) *controller.CatalogOut
 }
 
 func (c *Controller) Instance() *controller.InstanceOutput {
-	all := c.InstanceRepository.SelectAll()
+	all := c.instance.SelectAll()
 	instance := []controller.Instance{}
 	for i := range all {
 		instance = append(instance, *all[i])
@@ -83,7 +83,7 @@ func (c *Controller) Instance() *controller.InstanceOutput {
 }
 
 func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput {
-	s, ok := c.ServiceRepository.FindByID(in.ServiceID)
+	s, ok := c.service.FindByID(in.ServiceID)
 	if !ok {
 		return &controller.CreateOutput{
 			Status:  http.StatusBadRequest,
@@ -149,8 +149,8 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 	}
 
 	if res.Status == http.StatusOK || res.Status == http.StatusCreated {
-		i.Output = res.Output
-		c.InstanceRepository.Insert(i)
+		i.Output = res.Instance.Output
+		c.instance.Insert(i)
 		return &controller.CreateOutput{
 			Status:   res.Status,
 			Message:  res.Message,
@@ -159,7 +159,7 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 	}
 
 	if res.Status == http.StatusAccepted {
-		c.InstanceRepository.Insert(i)
+		c.instance.Insert(i)
 		return &controller.CreateOutput{
 			Status:   res.Status,
 			Message:  res.Message,
@@ -174,7 +174,7 @@ func (c *Controller) Create(in *controller.CreateInput) *controller.CreateOutput
 }
 
 func (c *Controller) Describe(in *controller.DescribeInput) *controller.DescribeOutput {
-	i, ok := c.InstanceRepository.FindByID(in.InstanceID)
+	i, ok := c.instance.FindByID(in.InstanceID)
 	if !ok {
 		return &controller.DescribeOutput{
 			Status:  http.StatusBadRequest,
@@ -182,7 +182,7 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 		}
 	}
 
-	s, ok := c.ServiceRepository.FindByID(i.ServiceID)
+	s, ok := c.service.FindByID(i.ServiceID)
 	if !ok {
 		return &controller.DescribeOutput{
 			Status:  http.StatusBadRequest,
@@ -190,23 +190,7 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 		}
 	}
 
-	input := &broker.DescribeInput{
-		InstanceID: in.InstanceID,
-		Parameter:  i.Parameter,
-	}
-	jb, err := json.Marshal(input)
-	if err != nil {
-		return &controller.DescribeOutput{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("unmarshal request body: %v", err),
-		}
-	}
-
-	out, err := http.Post(
-		fmt.Sprintf("%s/v1/service/%s/describe", s.ServiceBrokerURL, in.InstanceID),
-		"application/json",
-		bytes.NewReader(jb),
-	)
+	out, err := http.Get(fmt.Sprintf("%s/v1/service/%s", s.ServiceBrokerURL, in.InstanceID))
 	if err != nil {
 		return &controller.DescribeOutput{
 			Status:  http.StatusBadRequest,
@@ -263,7 +247,7 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 		}
 	}
 
-	if s, ok := c.ServiceRepository.FindByName(res.Name); ok {
+	if s, ok := c.service.FindByName(res.Name); ok {
 		return &controller.RegisterOutput{
 			Status:    http.StatusConflict,
 			ServiceID: s.ServiceID,
@@ -279,8 +263,8 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 		}
 	}
 
-	c.CatalogRepository.Insert(&res)
-	c.ServiceRepository.Insert(&controller.Service{
+	c.catalog.Insert(&res)
+	c.service.Insert(&controller.Service{
 		Name:             res.Name,
 		ServiceID:        uuid.String(),
 		ServiceBrokerURL: in.URL,

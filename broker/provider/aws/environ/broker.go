@@ -37,11 +37,15 @@ func (b *EnvironBroker) Catalog() *broker.Catalog {
 }
 
 func (b *EnvironBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
-	out := make(map[string]string)
+	i := &broker.Instance{
+		InstanceID: in.InstanceID,
+		Parameter:  in.Parameter,
+	}
+
 	return &broker.CreateOutput{
-		Status:  202,
-		Message: "Accepted",
-		Output:  out,
+		Status:   202,
+		Message:  "Accepted",
+		Instance: i,
 	}
 }
 
