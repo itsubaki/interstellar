@@ -14,14 +14,24 @@ import (
 func Run(s ServiceController) {
 	g := gin.New()
 
+	path := env.GetValue("INDEX", "./index.html")
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("read html: %v", err)
+	}
+
 	g.GET("", func(c *gin.Context) {
-		path := env.GetValue("INDEX", "./index.html")
-		file, err := ioutil.ReadFile(path)
+		if !gin.IsDebugging() {
+			c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+			c.Writer.Write(file)
+			return
+		}
+
+		file, err = ioutil.ReadFile(path)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, fmt.Errorf("read html: %v", err))
 			return
 		}
-
 		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 		c.Writer.Write(file)
 	})
