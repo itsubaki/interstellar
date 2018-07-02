@@ -11,7 +11,9 @@
     <div id="root"></div>
     <script type="text/babel">
 
-    class Register extends React.Component {
+    var endpoint = "http://localhost:9080"
+
+    class ServiceRegister extends React.Component {
       constructor(props) {
         super(props);
 
@@ -32,8 +34,8 @@
           url: this.state.url
         };
 
-        fetch('http://localhost:9080/v1/register', {
-            method: 'POST',
+        fetch(endpoint + "/v1/register", {
+            method: "POST",
             body: JSON.stringify(data)
         })
         event.preventDefault();
@@ -58,12 +60,40 @@
         super(props);
 
         this.state = {
+          service_id: props.service_id,
+          catalog: {}
+        };
+      }
+
+      componentDidMount() {
+        fetch(endpoint + "/v1/service/" + this.state.service_id)
+        .then(res => res.json())
+        .then(data => this.setState({catalog: data.catalog}));
+      }
+
+      render() {
+        const { service_id, catalog } = this.state;
+        console.log(catalog)
+
+        return (
+          <div className="service">
+            <a href={endpoint + "/v1/service/" + service_id}>{catalog.name}</a>
+          </div>
+        );
+      }
+    }
+
+    class ServiceList extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
           service: []
         };
       }
 
       componentDidMount() {
-        fetch("http://localhost:9080/v1/service")
+        fetch(endpoint + "/v1/service")
         .then(res => res.json())
         .then(data => this.setState({service: data.service}));
       }
@@ -72,11 +102,11 @@
         const { service } = this.state;
 
         return (
-          <div className="service">
+          <div className="servicelist">
             <h3>service</h3>
             {service.map(s =>
               <div key={s.service_id}>
-                <a href={"http://localhost:9080/v1/service/" + s.service_id}>{s.name}</a>
+                <Service service_id={s.service_id}/>
               </div>
             )}
           </div>
@@ -84,7 +114,7 @@
       }
     }
 
-    class Instance extends React.Component {
+    class InstanceList extends React.Component {
       constructor(props) {
         super(props);
 
@@ -94,7 +124,7 @@
       }
 
       componentDidMount() {
-        fetch("http://localhost:9080/v1/instance")
+        fetch(endpoint + "/v1/instance")
         .then(res => res.json())
         .then(data => this.setState({instance: data.instance}));
       }
@@ -103,11 +133,11 @@
         const { instance } = this.state;
 
         return (
-          <div className="instance">
+          <div className="instancelist">
             <h3>instance</h3>
             {instance.map(i =>
               <div key={i.instance_id}>
-                <a href={"http://localhost:9080/v1/instance/" + i.instance_id}>{i.name}</a>
+                <a href={endpoint + "/v1/instance/" + i.instance_id}>{i.name}</a>
               </div>
             )}
           </div>
@@ -123,9 +153,9 @@
       render() {
         return (
           <div className="app">
-            <Service />
-            <Register />
-            <Instance />
+            <ServiceList />
+            <ServiceRegister />
+            <InstanceList />
           </div>
         );
       }
