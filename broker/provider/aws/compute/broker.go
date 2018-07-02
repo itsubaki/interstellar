@@ -27,8 +27,8 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 		},
 		Bindable: false,
 		ParameterSpec: []broker.ParamSpec{
-			{Name: "integration_role_arn", Required: false},
-			{Name: "region", Required: true},
+			{Name: "integration_role_arn", Required: true},
+			{Name: "region", Required: false},
 
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},

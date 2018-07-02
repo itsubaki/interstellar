@@ -27,14 +27,12 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 		},
 		Bindable: true,
 		ParameterSpec: []broker.ParamSpec{
-			{Name: "integration_role_arn", Required: false},
-			{Name: "region", Required: true},
+			{Name: "integration_role_arn", Required: true},
+			{Name: "region", Required: false},
 
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 			{Name: "instance_name", Required: true},
-			{Name: "master_username", Required: true},
-			{Name: "master_password", Required: true},
 		},
 	}
 }
