@@ -47,7 +47,7 @@ up-compute:
 
 register-localhost:
 	set -x
-	ex
+
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9081"}'  | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9082"}'  | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9083"}'  | jq .
@@ -105,12 +105,12 @@ service:
 instance:
 	set -x
 
-	curl -s localhost:9080/v1/instance| jq .
+	curl -s localhost:9080/v1/instance | jq .
 
 create:
 	set -x
 
-	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01", "parameter": {"project_name": "myproject", "region": "ap-east-1", "domain": "example.com"}}' | jq .
+	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01", "parameter": {"project_name": "myproject", "region": "us-east-1", "domain": "example.com"}}' | jq .
 
 prune:
 	set -x

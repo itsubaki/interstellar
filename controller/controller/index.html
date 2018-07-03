@@ -58,18 +58,12 @@
     class Catalog extends React.Component{
       constructor(props) {
         super(props);
-
-        this.state = {
-          catalog: props.catalog
-        };
       }
 
       render() {
-        const { catalog } = this.state;
-
         return (
           <React.Fragment>
-            {JSON.stringify(catalog)}
+            {JSON.stringify(this.props.catalog)}
           </React.Fragment>
         );
       }
@@ -81,7 +75,6 @@
 
         this.state = {
           checked: false,
-          service_id: props.service_id,
           catalog: {}
         };
       }
@@ -91,13 +84,13 @@
       }
 
       componentDidMount() {
-        fetch(endpoint + "/v1/service/" + this.state.service_id)
+        fetch(endpoint + "/v1/service/" + this.props.service_id)
         .then(res => res.json())
         .then(data => this.setState({catalog: data.catalog}));
       }
 
       render() {
-        const { checked, service_id, catalog } = this.state;
+        const { checked, catalog } = this.state;
 
         return (
           <div className="service">
