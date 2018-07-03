@@ -8,8 +8,8 @@ import (
 type CacheBroker struct {
 }
 
-func NewCacheBroker() *CacheBroker {
-	return &CacheBroker{}
+func NewCacheBroker() (*CacheBroker, error) {
+	return &CacheBroker{}, nil
 }
 
 func (b *CacheBroker) Config() *broker.Config {

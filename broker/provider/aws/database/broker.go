@@ -8,8 +8,8 @@ import (
 type DatabaseBroker struct {
 }
 
-func NewDatabaseBroker() *DatabaseBroker {
-	return &DatabaseBroker{}
+func NewDatabaseBroker() (*DatabaseBroker, error) {
+	return &DatabaseBroker{}, nil
 }
 
 func (b *DatabaseBroker) Config() *broker.Config {

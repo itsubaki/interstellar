@@ -8,8 +8,8 @@ import (
 type EnvironBroker struct {
 }
 
-func NewEnvironBroker() *EnvironBroker {
-	return &EnvironBroker{}
+func NewEnvironBroker() (*EnvironBroker, error) {
+	return &EnvironBroker{}, nil
 }
 
 func (b *EnvironBroker) Config() *broker.Config {

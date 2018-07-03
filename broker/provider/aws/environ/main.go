@@ -3,5 +3,5 @@ package main
 import "github.com/itsubaki/interstellar/broker"
 
 func main() {
-	broker.Run(NewEnvironBroker())
+	broker.Run(broker.Must(NewEnvironBroker()))
 }

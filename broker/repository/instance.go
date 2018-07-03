@@ -20,10 +20,8 @@ func (r *InstanceRepository) Update(i *broker.Instance) error {
 		return fmt.Errorf("instance=%s not found", i.InstanceID)
 	}
 
-	exist.Parameter = i.Parameter
-	exist.Output = i.Output
 	exist.Status = i.Status
-
+	exist.Output = i.Output
 	return nil
 }
 

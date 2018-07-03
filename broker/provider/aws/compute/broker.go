@@ -8,8 +8,8 @@ import (
 type ComputeBroker struct {
 }
 
-func NewComputeBroker() *ComputeBroker {
-	return &ComputeBroker{}
+func NewComputeBroker() (*ComputeBroker, error) {
+	return &ComputeBroker{}, nil
 }
 
 func (b *ComputeBroker) Config() *broker.Config {

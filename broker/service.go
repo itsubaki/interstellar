@@ -11,7 +11,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func Must(b ServiceBroker, err error) ServiceBroker {
+	if err != nil {
+		log.Printf("new broker: %v", err)
+		os.Exit(1)
+	}
+
+	return b
+}
+
 func Run(b ServiceBroker) {
+
 	g := gin.New()
 
 	g.GET("/v1/catalog", func(c *gin.Context) {
