@@ -81,6 +81,7 @@ type DescribeInput struct {
 }
 
 type DescribeOutput struct {
-	Status  int    `json:"status"`
-	Message string `json:"message,omitempty"`
+	Status   int       `json:"status"`
+	Message  string    `json:"message,omitempty"`
+	Instance *Instance `json:"instance,omitempty"`
 }

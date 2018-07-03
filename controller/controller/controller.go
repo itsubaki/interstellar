@@ -215,9 +215,18 @@ func (c *Controller) Describe(in *controller.DescribeInput) *controller.Describe
 		}
 	}
 
+	instance := &controller.Instance{
+		Name:       i.Name,
+		ServiceID:  i.ServiceID,
+		InstanceID: res.Instance.InstanceID,
+		Parameter:  res.Instance.Parameter,
+		Output:     res.Instance.Output,
+	}
+
 	return &controller.DescribeOutput{
-		Status:  res.Status,
-		Message: res.Message,
+		Status:   res.Status,
+		Message:  res.Message,
+		Instance: instance,
 	}
 }
 
@@ -255,7 +264,7 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 		}
 	}
 
-	uuid, err := uuid.NewUUID()
+	id, err := uuid.NewUUID()
 	if err != nil {
 		return &controller.RegisterOutput{
 			Status:  http.StatusInternalServerError,
@@ -266,12 +275,12 @@ func (c *Controller) Register(in *controller.RegisterInput) *controller.Register
 	c.catalog.Insert(&res)
 	c.service.Insert(&controller.Service{
 		Name:             res.Name,
-		ServiceID:        uuid.String(),
+		ServiceID:        id.String(),
 		ServiceBrokerURL: in.URL,
 	})
 
 	return &controller.RegisterOutput{
 		Status:    http.StatusOK,
-		ServiceID: uuid.String(),
+		ServiceID: id.String(),
 	}
 }
