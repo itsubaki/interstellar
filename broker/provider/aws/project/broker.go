@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/itsubaki/env"
@@ -65,13 +64,7 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 
 func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	sess := session.Must(session.NewSession())
-	cfn := cloudformation.New(
-		sess,
-		&aws.Config{
-			Credentials: credentials.NewSharedCredentials("", in.Parameter["project_name"]),
-			Region:      aws.String(in.Parameter["region"]),
-		},
-	)
+	cfn := cloudformation.New(sess, &aws.Config{Region: aws.String(in.Parameter["region"])})
 
 	param := []*cloudformation.Parameter{
 		{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
