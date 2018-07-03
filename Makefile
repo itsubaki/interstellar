@@ -21,17 +21,33 @@ package:
 	cp broker/provider/aws/cache/template.yml    ${BUILD}/broker/cache/conf
 	cp broker/provider/aws/compute/template.yml  ${BUILD}/broker/compute/conf
 
-run:
+up-controller:
 	set -x
-
-	# export BUILD=${PWD}/_build
 	PORT=:9080 INDEX=./controller/controller/index.html            ${BUILD}/controller/bin/controller
+
+up-project:
+	set -x
 	PORT=:9081 TEMPLATE=${BUILD}/broker/project/conf/template.yml  ${BUILD}/broker/project/bin/project
+
+up-environ:
+	set -x
 	PORT=:9082 TEMPLATE=${BUILD}/broker/environ/conf/template.yml  ${BUILD}/broker/environ/bin/environ
+
+up-database:
+	set -x
 	PORT=:9083 TEMPLATE=${BUILD}/broker/database/conf/template.yml ${BUILD}/broker/database/bin/database
+
+up-cache:
+	set -x
 	PORT=:9084 TEMPLATE=${BUILD}/broker/cache/conf/template.yml    ${BUILD}/broker/cache/bin/cache
+
+up-compute:
+	set -x
 	PORT=:9085 TEMPLATE=${BUILD}/broker/compute/conf/template.yml  ${BUILD}/broker/compute/bin/compute
 
+register-localhost:
+	set -x
+	ex
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9081"}'  | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9082"}'  | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://localhost:9083"}'  | jq .
@@ -70,7 +86,6 @@ register:
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.database_1:8080"}' | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.cache_1:8080"}'    | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.compute_1:8080"}'  | jq .
-
 
 catalog:
 	set -x

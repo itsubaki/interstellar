@@ -55,14 +55,39 @@
       }
     }
 
+    class Catalog extends React.Component{
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          catalog: props.catalog
+        };
+      }
+
+      render() {
+        const { catalog } = this.state;
+
+        return (
+          <React.Fragment>
+            {JSON.stringify(catalog)}
+          </React.Fragment>
+        );
+      }
+    }
+
     class Service extends React.Component {
       constructor(props) {
         super(props);
 
         this.state = {
+          checked: false,
           service_id: props.service_id,
           catalog: {}
         };
+      }
+
+      check(e) {
+        this.setState({ checked: e.target.checked});
       }
 
       componentDidMount() {
@@ -72,12 +97,19 @@
       }
 
       render() {
-        const { service_id, catalog } = this.state;
-        console.log(this.state.catalog)
+        const { checked, service_id, catalog } = this.state;
 
         return (
           <div className="service">
-            <a href={endpoint + "/v1/service/" + service_id}>{catalog.name}</a>
+            <input type="checkbox" checked={checked} onClick={e => this.check(e)} />{catalog.name}<br/>
+            {(() => {
+              if (checked) {
+                return (
+                  <Catalog catalog={catalog} />
+                );
+              }
+              return null;
+            })()}
           </div>
         );
       }
