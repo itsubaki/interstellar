@@ -17,8 +17,7 @@ Parameters:
 Outputs:
   ContainerRepository:
     Value: !Sub
-      - ${AccountId}.dkr.ecr.${Region}.amazonaws.com/${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
-      - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+      - ${AWS::AccountId}.dkr.ecr.${Region}.amazonaws.com/${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
       - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
       - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
   LogGroup:
@@ -167,7 +166,7 @@ Resources:
   Repository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub ${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
-        - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+      RepositoryName: !Sub
+        - ${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
         - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}

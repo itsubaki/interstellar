@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/itsubaki/env"
@@ -68,14 +68,14 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	cfn := cloudformation.New(
 		sess,
 		&aws.Config{
-			Credentials: stscreds.NewCredentials(sess, in.Parameter["integration_role_arn"]),
+			Credentials: credentials.NewSharedCredentials("", in.Parameter["project_name"]),
 			Region:      aws.String(in.Parameter["region"]),
-		})
+		},
+	)
 
 	param := []*cloudformation.Parameter{
 		{ParameterKey: aws.String("ProjectName"), ParameterValue: aws.String(in.Parameter["project_name"])},
 		{ParameterKey: aws.String("DomainName"), ParameterValue: aws.String(in.Parameter["domain"])},
-		{ParameterKey: aws.String("AccountId"), ParameterValue: aws.String(in.Parameter["aws_account_id"])},
 		{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
 	}
 

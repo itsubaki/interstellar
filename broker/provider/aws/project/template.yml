@@ -10,10 +10,6 @@ Parameters:
   DomainName:
     Description: ""
     Type: String
-  AccountId:
-    Description: ""
-    Type: String
-    Default: ""
   Region:
     Description: ""
     Type: String
@@ -61,10 +57,6 @@ Outputs:
     Value: !Ref CidrBlock
     Export:
       Name: !Sub ${ProjectName}-CidrBlock
-  AccountId:
-    Value: !Ref AccountId
-    Export:
-      Name: !Sub ${ProjectName}-AccountId
   Region:
     Value: !Ref Region
     Export:
@@ -337,7 +329,7 @@ Resources:
   #           Principal:
   #             Service: cloudtrail.amazonaws.com
   #           Action: s3:PutObject
-  #           Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
+  #           Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AWS::AccountId}/*
   #           Condition:
   #             StringEquals:
   #               s3:x-amz-acl: bucket-owner-full-control

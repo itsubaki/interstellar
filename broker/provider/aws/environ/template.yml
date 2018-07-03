@@ -114,6 +114,4 @@ Resources:
                 - 027434742980 # us-west-1
                 - 797873946194 # us-west-2
             Action: s3:PutObject
-            Resource: !Sub
-              - arn:aws:s3:::${S3BucketLog}/AWSLogs/${AccountId}/*
-              - { "AccountId": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-AccountId" } }}
+            Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AWS::AccountId}/*
