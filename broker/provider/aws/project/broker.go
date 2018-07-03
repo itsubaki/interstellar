@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -73,7 +74,7 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 	}
 
 	input := &cloudformation.CreateStackInput{
-		StackName:    &in.InstanceID,
+		StackName:    aws.String(strings.Replace(in.InstanceID, "-", "", -1)),
 		Parameters:   param,
 		TemplateBody: &b.template,
 	}
