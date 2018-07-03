@@ -27,12 +27,10 @@ func (b *CacheBroker) Catalog() *broker.Catalog {
 		},
 		Bindable: false,
 		ParameterSpec: []broker.ParamSpec{
-			{Name: "integration_role_arn", Required: true},
-			{Name: "region", Required: false},
-
 			{Name: "project_name", Required: true},
 			{Name: "environ_name", Required: true},
 			{Name: "instance_name", Required: true},
+			{Name: "region", Required: false},
 		},
 	}
 }

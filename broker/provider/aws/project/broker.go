@@ -51,13 +51,10 @@ func (b *ProjectBroker) Catalog() *broker.Catalog {
 		},
 		Bindable: false,
 		ParameterSpec: []broker.ParamSpec{
-			{Name: "integration_role_arn", Required: true},
-			{Name: "region", Required: false},
-
 			{Name: "project_name", Required: true},
+			{Name: "region", Required: false},
 			{Name: "domain", Required: true},
-			{Name: "aws_account_id", Required: true},
-			{Name: "cidr", Required: true},
+			{Name: "cidr", Required: false},
 		},
 	}
 }
@@ -72,8 +69,9 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 		{ParameterKey: aws.String("Region"), ParameterValue: aws.String(in.Parameter["region"])},
 	}
 
+	name := fmt.Sprintf("%s-%s", in.Parameter["project_name"], in.InstanceID)
 	input := &cloudformation.CreateStackInput{
-		StackName:    aws.String(fmt.Sprintf("%s-%s", in.Parameter["project_name"], in.InstanceID)),
+		StackName:    &name,
 		Parameters:   param,
 		TemplateBody: &b.template,
 	}
@@ -94,7 +92,7 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 
 	go func() {
 		input := &cloudformation.DescribeStacksInput{
-			StackName: &in.InstanceID,
+			StackName: &name,
 		}
 
 		if err := cfn.WaitUntilStackCreateComplete(input); err != nil {
@@ -116,6 +114,7 @@ func (b *ProjectBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
 
 		i.Status = *desc.Stacks[0].StackStatus
 		i.Output = out
+
 		if err := b.instance.Update(i); err != nil {
 			log.Printf("update instance_id=%s: %v", in.InstanceID, err)
 		}

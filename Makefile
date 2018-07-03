@@ -95,9 +95,8 @@ instance:
 create:
 	set -x
 
-	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01", "parameter": {"project_name": "myproject", "cidr": "10.1.0.0/16", "region": "ap-northeast-1"}}' | jq .
+	curl -s X POST  localhost:9080/v1/instance -d '{"service_id": "$(shell curl -s localhost:9080/v1/service | jq -r '.service[0].service_id')", "name": "develop01", "parameter": {"project_name": "myproject", "region": "ap-east-1", "domain": "example.com"}}' | jq .
 
-	
 prune:
 	set -x
 
