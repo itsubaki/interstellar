@@ -21,7 +21,6 @@ func Must(b ServiceBroker, err error) ServiceBroker {
 }
 
 func Run(b ServiceBroker) {
-
 	g := gin.New()
 
 	g.GET("/v1/catalog", func(c *gin.Context) {
