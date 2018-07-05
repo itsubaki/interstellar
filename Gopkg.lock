@@ -76,6 +76,12 @@
   revision = "cd1ef7a0025b983ce516830621e9411a6945df11"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/itsubaki/required"
+  packages = ["."]
+  revision = "40ffb19203e3e0dfb523bb862bb9a9e412eed2f2"
+
+[[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "0b12d6b5"
@@ -113,6 +119,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2fdb7bd3d7b4aa1a018fecbfe7b674cbfbccdd4522245f8dc688547a6eb648e9"
+  inputs-digest = "cb86363c2bcc8971e770e7788295e4e955f8abd38d91c7966b08e133e89f4a5f"
   solver-name = "gps-cdcl"
   solver-version = 1

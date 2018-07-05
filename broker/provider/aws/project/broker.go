@@ -49,7 +49,7 @@ func NewProjectBroker() (*ProjectBroker, error) {
 		req.Put(p.Name, p.Required)
 	}
 
-	f, err := ioutil.ReadFile(c.Template)
+	f, err := ioutil.ReadFile(config.Template)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %v", err)
 	}
