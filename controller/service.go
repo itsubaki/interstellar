@@ -14,6 +14,14 @@ import (
 func Run(s ServiceController) {
 	g := gin.New()
 
+	if gin.IsDebugging() {
+		g.Use(func(c *gin.Context) {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
+		})
+	}
+
 	path := env.GetValue("INDEX", "./index.html")
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -21,17 +29,14 @@ func Run(s ServiceController) {
 	}
 
 	g.GET("", func(c *gin.Context) {
-		if !gin.IsDebugging() {
-			c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-			c.Writer.Write(file)
-			return
+		if gin.IsDebugging() {
+			file, err = ioutil.ReadFile(path)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, fmt.Errorf("read html: %v", err))
+				return
+			}
 		}
 
-		file, err = ioutil.ReadFile(path)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, fmt.Errorf("read html: %v", err))
-			return
-		}
 		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 		c.Writer.Write(file)
 	})
