@@ -3,35 +3,7 @@
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
-  packages = [
-    "aws",
-    "aws/awserr",
-    "aws/awsutil",
-    "aws/client",
-    "aws/client/metadata",
-    "aws/corehandlers",
-    "aws/credentials",
-    "aws/credentials/ec2rolecreds",
-    "aws/credentials/endpointcreds",
-    "aws/credentials/stscreds",
-    "aws/csm",
-    "aws/defaults",
-    "aws/ec2metadata",
-    "aws/endpoints",
-    "aws/request",
-    "aws/session",
-    "aws/signer/v4",
-    "internal/sdkio",
-    "internal/sdkrand",
-    "internal/shareddefaults",
-    "private/protocol",
-    "private/protocol/query",
-    "private/protocol/query/queryutil",
-    "private/protocol/rest",
-    "private/protocol/xml/xmlutil",
-    "service/cloudformation",
-    "service/sts"
-  ]
+  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/csm","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/sdkio","internal/sdkrand","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/cloudformation","service/sts"]
   revision = "8f7d1442888a1f96115869cec4af9855018ece98"
   version = "v1.14.18"
 
@@ -43,11 +15,7 @@
 
 [[projects]]
   name = "github.com/gin-gonic/gin"
-  packages = [
-    ".",
-    "binding",
-    "render"
-  ]
+  packages = [".","binding","render"]
   revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
   version = "v1.2"
 
@@ -74,6 +42,12 @@
   name = "github.com/itsubaki/env"
   packages = ["."]
   revision = "cd1ef7a0025b983ce516830621e9411a6945df11"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/itsubaki/required"
+  packages = ["."]
+  revision = "40ffb19203e3e0dfb523bb862bb9a9e412eed2f2"
 
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
@@ -113,6 +87,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2fdb7bd3d7b4aa1a018fecbfe7b674cbfbccdd4522245f8dc688547a6eb648e9"
+  inputs-digest = "cb86363c2bcc8971e770e7788295e4e955f8abd38d91c7966b08e133e89f4a5f"
   solver-name = "gps-cdcl"
   solver-version = 1
