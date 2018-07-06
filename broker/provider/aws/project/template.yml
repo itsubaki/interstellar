@@ -318,6 +318,15 @@ Resources:
   #     PolicyDocument:
   #       Version: 2012-10-17
   #       Statement:
+  #         - Sid: ALBLogBucketPolicy
+  #           Effect: Allow
+  #           Principal:
+  #             AWS:
+  #               - 582318560864 # ap-northeast-1
+  #               - 127311923021 # us-east-1
+  #               - 033677994240 # us-east-2
+  #               - 027434742980 # us-west-1
+  #               - 797873946194 # us-west-2
   #         - Sid: AWSCloudTrailAclCheck
   #           Effect: Allow
   #           Principal:
@@ -333,7 +342,7 @@ Resources:
   #           Condition:
   #             StringEquals:
   #               s3:x-amz-acl: bucket-owner-full-control
-  #
+
   # CloudTrail:
   #   DependsOn: BucketPolicy
   #   Type: AWS::CloudTrail::Trail

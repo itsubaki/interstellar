@@ -7,7 +7,7 @@ Parameters:
   ProjectName:
     Description: ""
     Type: String
-  EnvironName:
+  NetworkName:
     Description: ""
     Type: String
   InstanceName:
@@ -42,8 +42,8 @@ Parameters:
 Outputs:
   ProjectName:
     Value: !Ref ProjectName
-  EnvironName:
-    Value: !Ref EnvironName
+  NetworkName:
+    Value: !Ref NetworkName
   InstanceName:
     Value: !Ref InstanceName
   WriteEndpoint:
@@ -61,7 +61,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-db-${InstanceName}-write.${ProjectName}.${DomainName}
+        - ${NetworkName}-db-${InstanceName}-write.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       TTL: "900"
       ResourceRecords:
@@ -76,7 +76,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-db-${InstanceName}-read.${ProjectName}.${DomainName}
+        - ${NetworkName}-db-${InstanceName}-read.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       TTL: "900"
       ResourceRecords:
@@ -87,7 +87,7 @@ Resources:
     Properties:
       Description: ""
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_db_${InstanceName}_read_endpoint
+      Name: !Sub ${ProjectName}_${NetworkName}_db_${InstanceName}_read_endpoint
       Value: !Ref WriteEndpoint
 
   ParameterStoreReadEndpoint:
@@ -95,7 +95,7 @@ Resources:
     Properties:
       Description: ""
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_db_${InstanceName}_write_endpoint
+      Name: !Sub ${ProjectName}_${NetworkName}_db_${InstanceName}_write_endpoint
       Value: !Ref ReadEndpoint
 
   ParameterStoreMasterUsername:
@@ -103,7 +103,7 @@ Resources:
     Properties:
       Description: ""
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_db_${InstanceName}_masterusername
+      Name: !Sub ${ProjectName}_${NetworkName}_db_${InstanceName}_masterusername
       Value: !Ref MasterUsername
 
   ParameterStoreMasterPassword:
@@ -111,7 +111,7 @@ Resources:
     Properties:
       Description: ""
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_db_${InstanceName}_masterpassword
+      Name: !Sub ${ProjectName}_${NetworkName}_db_${InstanceName}_masterpassword
       Value: !Ref MasterPassword
 
   SubnetGroup:
@@ -125,12 +125,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-db-${InstanceName}.${ProjectName}.${DomainName}
+            - ${NetworkName}-db-${InstanceName}.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -174,12 +174,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-db-${InstanceName}.${ProjectName}.${DomainName}
+            - ${NetworkName}-db-${InstanceName}.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -194,12 +194,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-db-${InstanceName}.${ProjectName}.${DomainName}
+            - ${NetworkName}-db-${InstanceName}.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -213,15 +213,15 @@ Resources:
       DBSubnetGroupName:  !Ref SubnetGroup
       DBClusterParameterGroupName: !Ref ParameterGroup
       VpcSecurityGroupIds:
-        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup"}
+        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${NetworkName}-BackendSecurityGroup"}
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-db-${InstanceName}.${ProjectName}.${DomainName}
+            - ${NetworkName}-db-${InstanceName}.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName

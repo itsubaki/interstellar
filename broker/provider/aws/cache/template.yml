@@ -7,7 +7,7 @@ Parameters:
   ProjectName:
     Description: ""
     Type: String
-  EnvironName:
+  NetworkName:
     Description: ""
     Type: String
   InstanceName:
@@ -73,14 +73,14 @@ Parameters:
 Outputs:
   ProjectName:
     Value: !Ref ProjectName
-  EnvironName:
-    Value: !Ref EnvironName
+  NetworkName:
+    Value: !Ref NetworkName
   InstanceName:
     Value: !Ref InstanceName
   Endpoint:
     Value: !Ref Endpoint
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-cache-${InstanceName}-endpoint
+      Name: !Sub ${ProjectName}-${NetworkName}-cache-${InstanceName}-endpoint
 
 Resources:
   Endpoint:
@@ -92,7 +92,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-cache-${InstanceName}.${ProjectName}.${DomainName}
+        - ${NetworkName}-cache-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       TTL: "900"
       ResourceRecords:
@@ -103,7 +103,7 @@ Resources:
     Properties:
       Description: InternalEndpoint
       Type: String
-      Name: !Sub ${ProjectName}_${EnvironName}_cache_${InstanceName}_endpoint
+      Name: !Sub ${ProjectName}_${NetworkName}_cache_${InstanceName}_endpoint
       Value: !Ref Endpoint
 
   SubnetGroup:
@@ -135,15 +135,15 @@ Resources:
       EngineVersion:            !Ref EngineVersion
       NumCacheClusters:         !Ref NumCacheClusters
       SecurityGroupIds:
-        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup"}
+        - { "Fn::ImportValue": !Sub "!Sub ${ProjectName}-${NetworkName}-BackendSecurityGroup"}
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-cache-${InstanceName}.${ProjectName}.${DomainName}.
+            - ${NetworkName}-cache-${InstanceName}.${ProjectName}.${DomainName}.
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName

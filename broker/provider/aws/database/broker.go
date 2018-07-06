@@ -28,7 +28,7 @@ func (b *DatabaseBroker) Catalog() *broker.Catalog {
 		Bindable: true,
 		ParameterSpec: []broker.ParamSpec{
 			{Name: "project_name", Required: true},
-			{Name: "environ_name", Required: true},
+			{Name: "network_name", Required: true},
 			{Name: "instance_name", Required: true},
 			{Name: "region", Required: false},
 		},

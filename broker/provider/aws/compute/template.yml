@@ -7,7 +7,7 @@ Parameters:
   ProjectName:
     Description: ""
     Type: String
-  EnvironName:
+  NetworkName:
     Description: ""
     Type: String
   InstanceName:
@@ -57,7 +57,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+        - ${NetworkName}-${InstanceName}.${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
 
   LoadBalancer:
@@ -69,12 +69,12 @@ Resources:
           Value: true
         - Key: access_logs.s3.bucket
           Value: !Sub
-            - ${EnvironName}-log.${ProjectName}.${DomainName}
+            - ${NetworkName}-log.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: idle_timeout.timeout_seconds
           Value: 60
       SecurityGroups:
-        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-InternetFacingSecurityGroup" } }
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${NetworkName}-InternetFacingSecurityGroup" } }
       Subnets:
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetPrimary" }
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetSecondary" }
@@ -82,12 +82,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+            - ${NetworkName}-${InstanceName}.${ProjectName}.${DomainName}.
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -102,8 +102,8 @@ Resources:
           Value: !Ref Endpoint
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -146,7 +146,7 @@ Resources:
             VolumeType: gp2
             VolumeSize: 30
       SecurityGroups:
-        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${NetworkName}-ApplicationSecurityGroup" } }
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -179,8 +179,8 @@ Resources:
           Value: !Ref Endpoint
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -196,7 +196,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - ${EnvironName}-readonly-${InstanceName}.${ProjectName}.${DomainName}
+        - ${NetworkName}-readonly-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -214,7 +214,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - ${EnvironName}-runcommand-${InstanceName}.${ProjectName}.${DomainName}
+        - ${NetworkName}-runcommand-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -231,7 +231,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - ${EnvironName}-s3bucket-${InstanceName}.${ProjectName}.${DomainName}
+        - ${NetworkName}-s3bucket-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -243,7 +243,7 @@ Resources:
               - ec2.amazonaws.com
       Policies:
         PolicyName: !Sub
-          - ${EnvironName}-readonly-${InstanceName}.${ProjectName}.${DomainName}
+          - ${NetworkName}-readonly-${InstanceName}.${ProjectName}.${DomainName}
           - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         PolicyDocument:
           Version: 2012-10-17
@@ -252,17 +252,17 @@ Resources:
               Action: s3:*
               Resource:
                 - !Sub
-                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}
+                  - arn:aws:s3:::${NetworkName}-log.${ProjectName}.${DomainName}
                   - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
                 - !Sub
-                  - arn:aws:s3:::${EnvironName}-log.${ProjectName}.${DomainName}/*
+                  - arn:aws:s3:::${NetworkName}-log.${ProjectName}.${DomainName}/*
                   - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
 
   LoadBalancerIAMRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - ${EnvironName}-elb-${InstanceName}.${ProjectName}.${DomainName}
+        - ${NetworkName}-elb-${InstanceName}.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -274,7 +274,7 @@ Resources:
               - ec2.amazonaws.com
       Policies:
         PolicyName: !Sub
-          - ${EnvironName}-elb-${InstanceName}.${ProjectName}.${DomainName}
+          - ${NetworkName}-elb-${InstanceName}.${ProjectName}.${DomainName}
           - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         PolicyDocument:
           Version: 2012-10-17
@@ -285,4 +285,4 @@ Resources:
                 - autoscaling:*
                 - elasticloadbalancing:*
                 - cloudwatch:GetMetricStatistics
-              Resource: * #TODO isolate with EnvironName
+              Resource: * #TODO isolate with NetworkName

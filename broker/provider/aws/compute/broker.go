@@ -28,14 +28,14 @@ func (b *ComputeBroker) Catalog() *broker.Catalog {
 		Bindable: false,
 		ParameterSpec: []broker.ParamSpec{
 			{Name: "project_name", Required: true},
-			{Name: "environ_name", Required: true},
+			{Name: "network_name", Required: true},
 			{Name: "instance_name", Required: true},
 			{Name: "region", Required: false},
 		},
 	}
 }
 
-// ExportName is related with project_name, environ_name, instance_name
+// ExportName is related with project_name, network_name, instance_name
 // ExportValue
 //  - endpoint
 func (b *ComputeBroker) Create(in *broker.CreateInput) *broker.CreateOutput {
@@ -61,9 +61,9 @@ func (b *ComputeBroker) Update(in *broker.UpdateInput) *broker.UpdateOutput {
 
 func (b *ComputeBroker) Binding(in *broker.BindingInput) *broker.BindingOutput {
 	// project_name
-	// environ_name
+	// network_name
 	// instance_name
-	// run_command -> docker environment
+	// run_command -> docker networkment
 	return &broker.BindingOutput{}
 }
 

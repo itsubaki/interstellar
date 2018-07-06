@@ -5,18 +5,18 @@ package:
 	-rm -rf ${BUILD}
 
 	mkdir -p ${BUILD}/controller/{bin,conf}
-	mkdir -p ${BUILD}/broker/{cache,compute,database,project,environ}/{bin,conf}
+	mkdir -p ${BUILD}/broker/{cache,compute,database,project,network}/{bin,conf}
 
 	cd controller/controller;        go build -o ${BUILD}/controller/bin/controller
 	cd broker/provider/aws/project;  go build -o ${BUILD}/broker/project/bin/project
-	cd broker/provider/aws/environ;  go build -o ${BUILD}/broker/environ/bin/environ
+	cd broker/provider/aws/network;  go build -o ${BUILD}/broker/network/bin/network
 	cd broker/provider/aws/database; go build -o ${BUILD}/broker/database/bin/database
 	cd broker/provider/aws/cache;    go build -o ${BUILD}/broker/cache/bin/cache
 	cd broker/provider/aws/compute;  go build -o ${BUILD}/broker/compute/bin/compute
 
 	cp controller/controller/index.html          ${BUILD}/controller/conf
 	cp broker/provider/aws/project/template.yml  ${BUILD}/broker/project/conf
-	cp broker/provider/aws/environ/template.yml  ${BUILD}/broker/environ/conf
+	cp broker/provider/aws/network/template.yml  ${BUILD}/broker/network/conf
 	cp broker/provider/aws/database/template.yml ${BUILD}/broker/database/conf
 	cp broker/provider/aws/cache/template.yml    ${BUILD}/broker/cache/conf
 	cp broker/provider/aws/compute/template.yml  ${BUILD}/broker/compute/conf
@@ -31,7 +31,7 @@ up-project:
 
 up-environ:
 	set -x
-	PORT=:9082 TEMPLATE=${BUILD}/broker/environ/conf/template.yml  ${BUILD}/broker/environ/bin/environ
+	PORT=:9082 TEMPLATE=${BUILD}/broker/network/conf/template.yml  ${BUILD}/broker/network/bin/network
 
 up-database:
 	set -x
@@ -59,7 +59,7 @@ build:
 
 	cd controller/controller;        docker build -t controller          .
 	cd broker/provider/aws/project;  docker build -t broker.aws.project  .
-	cd broker/provider/aws/environ;  docker build -t broker.aws.environ  .
+	cd broker/provider/aws/network;  docker build -t broker.aws.network  .
 	cd broker/provider/aws/database; docker build -t broker.aws.database .
 	cd broker/provider/aws/cache;    docker build -t broker.aws.cache    .
 	cd broker/provider/aws/compute;  docker build -t broker.aws.compute  .
@@ -82,7 +82,7 @@ register:
 	set -x
 
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.project_1:8080"}'  | jq .
-	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.environ_1:8080"}'  | jq .
+	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.network_1:8080"}'  | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.database_1:8080"}' | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.cache_1:8080"}'    | jq .
 	curl -sX POST localhost:9080/v1/register -d '{"url": "http://interstellar_broker.aws.compute_1:8080"}'  | jq .

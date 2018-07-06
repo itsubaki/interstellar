@@ -1,33 +1,33 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description:
-  AWS Environment
+  AWS Network
 
 Parameters:
   ProjectName:
     Description: ""
     Type: String
-  EnvironName:
+  NetworkName:
     Description: ""
     Type: String
 
 Outputs:
   ProjectName:
     Value: !Ref ProjectName
-  EnvironName:
-    Value: !Ref EnvironName
+  NetworkName:
+    Value: !Ref NetworkName
   InternetFacingSecurityGroup:
     Value: !Ref InternetFacingSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-InternetFacingSecurityGroup
+      Name: !Sub ${ProjectName}-${NetworkName}-InternetFacingSecurityGroup
   ApplicationSecurityGroup:
     Value: !Ref ApplicationSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-ApplicationSecurityGroup
+      Name: !Sub ${ProjectName}-${NetworkName}-ApplicationSecurityGroup
   BackendSecurityGroup:
     Value: !Ref BackendSecurityGroup
     Export:
-      Name: !Sub ${ProjectName}-${EnvironName}-BackendSecurityGroup
+      Name: !Sub ${ProjectName}-${NetworkName}-BackendSecurityGroup
 
 Resources:
   InternetFacingSecurityGroup:
@@ -37,7 +37,7 @@ Resources:
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}.${EnvironName}.internet-facing
+          Value: !Sub ${ProjectName}.${NetworkName}.internet-facing
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -48,7 +48,7 @@ Resources:
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}.${EnvironName}.application
+          Value: !Sub ${ProjectName}.${NetworkName}.application
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -59,7 +59,7 @@ Resources:
       VpcId: { "Fn::ImportValue": !Sub "${ProjectName}-VPC" }
       Tags:
         - Key: Name
-          Value: !Sub ${ProjectName}.${EnvironName}.backend
+          Value: !Sub ${ProjectName}.${NetworkName}.backend
         - Key: ProjectName
           Value: !Ref ProjectName
 
@@ -86,32 +86,12 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       BucketName: !Sub
-        - ${EnvironName}-log.${ProjectName}.${DomainName}
+        - ${NetworkName}-log.${ProjectName}.${DomainName}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironName}-log.${ProjectName}.${DomainName}
+          Value: !Sub ${NetworkName}-log.${ProjectName}.${DomainName}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
-
-  S3BucketLogPolicy:
-    DependsOn: S3BucketLog
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3BucketLog
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: ALBLogBucketPolicy
-            Effect: Allow
-            Principal:
-              AWS:
-                - 582318560864 # ap-northeast-1
-                - 127311923021 # us-east-1
-                - 033677994240 # us-east-2
-                - 027434742980 # us-west-1
-                - 797873946194 # us-west-2
-            Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${S3BucketLog}/AWSLogs/${AWS::AccountId}/*
+        - Key: NetworkName
+          Value: !Ref NetworkName

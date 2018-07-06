@@ -7,7 +7,7 @@ Parameters:
   ProjectName:
     Description: ""
     Type: String
-  EnvironName:
+  NetworkName:
     Description: ""
     Type: String
   InstanceName:
@@ -17,7 +17,7 @@ Parameters:
 Outputs:
   ContainerRepository:
     Value: !Sub
-      - ${AWS::AccountId}.dkr.ecr.${Region}.amazonaws.com/${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
+      - ${AWS::AccountId}.dkr.ecr.${Region}.amazonaws.com/${NetworkName}.${ProjectName}.${DomainName}/${InstanceName}
       - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
       - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
   LogGroup:
@@ -25,7 +25,7 @@ Outputs:
   TaskExecutionRole:
     Value: !Ref TaskExecutionRole
   ApplicationSecurityGroup:
-    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-ApplicationSecurityGroup" } }
+    Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${NetworkName}-ApplicationSecurityGroup" } }
   PublicSubnetPrimary:
     Value: { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-PublicSubnetPrimary" } }
   PublicSubnetSecondary:
@@ -46,7 +46,7 @@ Resources:
         - ${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
       Name: !Sub
-        - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+        - ${NetworkName}-${InstanceName}.${ProjectName}.${DomainName}.
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
 
   LoadBalancer:
@@ -58,12 +58,12 @@ Resources:
           Value: true
         - Key: access_logs.s3.bucket
           Value: !Sub
-            - ${EnvironName}-log.${ProjectName}.${DomainName}
+            - ${NetworkName}-log.${ProjectName}.${DomainName}
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: idle_timeout.timeout_seconds
           Value: 60
       SecurityGroups:
-        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${EnvironName}-InternetFacingSecurityGroup" } }
+        - { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-${NetworkName}-InternetFacingSecurityGroup" } }
       Subnets:
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetPrimary" }
         - { "Fn::ImportValue": !Sub "${ProjectName}-PublicSubnetSecondary" }
@@ -71,12 +71,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+            - ${NetworkName}-${InstanceName}.${ProjectName}.${DomainName}.
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -89,12 +89,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub
-            - ${EnvironName}-${InstanceName}.${ProjectName}.${DomainName}.
+            - ${NetworkName}-${InstanceName}.${ProjectName}.${DomainName}.
             - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
         - Key: ProjectName
           Value: !Ref ProjectName
-        - Key: EnvironName
-          Value: !Ref EnvironName
+        - Key: NetworkName
+          Value: !Ref NetworkName
         - Key: InstanceName
           Value: !Ref InstanceName
 
@@ -126,7 +126,7 @@ Resources:
   TaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${EnvironName}-task-executrion.${ProjectName}
+      RoleName: !Sub ${NetworkName}-task-executrion.${ProjectName}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -137,7 +137,7 @@ Resources:
               Service:
                 - ecs-tasks.amazonaws.com
       Policies:
-        - PolicyName: !Sub ${EnvironName}-task-executrion.${ProjectName}
+        - PolicyName: !Sub ${NetworkName}-task-executrion.${ProjectName}
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -155,18 +155,18 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       # cluster name must start with a letter and can only contain letters, numbers, or hyphens
-      ClusterName: !Sub ${ProjectName}-${EnvironName}-${InstanceName}
+      ClusterName: !Sub ${ProjectName}-${NetworkName}-${InstanceName}
 
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${ProjectName}.${EnvironName}/${InstanceName}
+      LogGroupName: !Sub ${ProjectName}.${NetworkName}/${InstanceName}
       RetentionInDays: 180
 
   Repository:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub
-        - ${EnvironName}.${ProjectName}.${DomainName}/${InstanceName}
+        - ${NetworkName}.${ProjectName}.${DomainName}/${InstanceName}
         - { "Region": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-Region" } }}
         - { "DomainName": { "Fn::ImportValue" : {"Fn::Sub": "${ProjectName}-DomainName" } }}
